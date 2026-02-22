@@ -97,7 +97,7 @@ binance_perps_pro/
 **Day 11–12 – Buffer / Launch prep**
 
 ## 3. Non-Negotiable Constraints (enforced in code)
-(See full list in project brief – all 15 will have unit tests)
+(See full list in project brief section #0 – all 15 should have unit tests)
 
 ## 4. Tech Stack
 - Python 3.11+
@@ -118,6 +118,10 @@ binance_perps_pro/
 - Notebook 02 reproduces realistic Sharpe with fees+funding
 - Zero lookahead in any column
 - Full process from scratch <90 min
+
+
+
+note: the symbol list contains 80 symbols listed in `symbols.txt` file in project root. This is the universe for us.
 
 ---
 
