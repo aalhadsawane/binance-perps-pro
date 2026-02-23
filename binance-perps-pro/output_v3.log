@@ -1,0 +1,17 @@
+2026-02-23 16:31:49,224 | INFO | Building panel with 2 symbols (max=2)
+Downloading raw files:   0%|          | 0/8 [00:00<?, ?it/s]2026-02-23 16:31:49,231 | INFO | ✅ Downloaded monthly fundingRate for BTCUSDT 2022-01
+2026-02-23 16:31:49,231 | INFO | ✅ Downloaded monthly fundingRate for BTCUSDT 2022-02
+2026-02-23 16:31:49,233 | INFO | ✅ Downloaded monthly klines for ETHUSDT 2022-01
+2026-02-23 16:31:49,233 | INFO | ✅ Downloaded monthly klines for ETHUSDT 2022-02
+2026-02-23 16:31:49,233 | INFO | ✅ Downloaded monthly klines for BTCUSDT 2022-01
+2026-02-23 16:31:49,233 | INFO | ✅ Downloaded monthly klines for BTCUSDT 2022-02
+2026-02-23 16:31:49,234 | INFO | ✅ Downloaded monthly fundingRate for ETHUSDT 2022-01
+2026-02-23 16:31:49,234 | INFO | ✅ Downloaded monthly fundingRate for ETHUSDT 2022-02
+Downloading raw files:  62%|██████▎   | 5/8 [00:11<00:06,  2.24s/it]Downloading raw files:  75%|███████▌  | 6/8 [00:11<00:03,  1.91s/it]Downloading raw files: 100%|██████████| 8/8 [00:12<00:00,  1.29s/it]Downloading raw files: 100%|██████████| 8/8 [00:12<00:00,  1.57s/it]
+2026-02-23 16:32:01,803 | INFO | ✅ Downloads complete. Building panel...
+Processing symbols:   0%|          | 0/2 [00:00<?, ?it/s]2026-02-23 16:32:01,832 | INFO | Cached BTCUSDT
+2026-02-23 16:32:01,853 | INFO | Cached ETHUSDT
+Processing symbols: 100%|██████████| 2/2 [00:00<00:00, 42.62it/s]
+/app/binance-perps-pro/process_data.py:407: DeprecationWarning: datetime.datetime.utcnow() is deprecated and scheduled for removal in a future version. Use timezone-aware objects to represent datetimes in UTC: datetime.datetime.now(datetime.UTC).
+  "generated": datetime.utcnow().isoformat(),
+2026-02-23 16:32:01,861 | INFO | ✅ SUCCESS! Parquet: data/binance_perps_panel_2022_2026.parquet (0.1 MB)
