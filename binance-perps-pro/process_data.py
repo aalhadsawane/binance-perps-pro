@@ -1,6 +1,7 @@
 #!/usr/bin/env python3
 """
-Binance USDT-M Perpetual Clean Panel Builder – v1.5 (PRODUCTION)
+Binance USDT-M Perpetual Clean Panel Builder – v1.6 (PRODUCTION)
+- Fixed: Cache Invalidation (Schema/Version changes)
 - Fixed: pl.datetime_range (Polars 1.x compatibility)
 - Fixed: BASE_URL clean (no ?prefix=)
 - Fixed: tqdm (sync loop) vs tqdm_asyncio (downloads only)
@@ -12,7 +13,7 @@ Binance USDT-M Perpetual Clean Panel Builder – v1.5 (PRODUCTION)
 - Fixed: Validation logic crash (ambiguous boolean expression)
 - All code-review suggestions implemented
 - All 15 original constraints + quant best practices
-- Ready for --max-symbols 2 --end-date 2022-02-01 (your fast test)
+- Ready for production use
 """
 
 import argparse
@@ -20,6 +21,7 @@ import asyncio
 import hashlib
 import json
 import logging
+import shutil
 from datetime import date, datetime, timedelta
 from pathlib import Path
 
@@ -40,6 +42,9 @@ CACHE_DIR = Path("cache")
 OUTPUT_PARQUET = Path("data/binance_perps_panel_2022_2026.parquet")
 START_DATE = date(2022, 1, 1)
 
+# Version string to invalidate cache if logic changes
+CODE_VERSION = "1.6"
+
 # Robust symbols.txt path
 SYMBOLS_FILE = Path(__file__).parent / "symbols.txt"
 SYMBOLS = [
@@ -49,6 +54,39 @@ SYMBOLS = [
 ]
 
 DOWNLOAD_SEMAPHORE = asyncio.Semaphore(12)
+
+# ==================== CACHE MANAGEMENT ====================
+def check_cache_version():
+    """Checks if the cache version matches the current code version."""
+    version_file = CACHE_DIR / "version.json"
+    if version_file.exists():
+        try:
+            with open(version_file, "r") as f:
+                meta = json.load(f)
+            if meta.get("version") == CODE_VERSION:
+                return True
+        except Exception:
+            pass
+    return False
+
+def update_cache_version():
+    """Updates the cache version file."""
+    CACHE_DIR.mkdir(parents=True, exist_ok=True)
+    with open(CACHE_DIR / "version.json", "w") as f:
+        json.dump({"version": CODE_VERSION, "updated": datetime.utcnow().isoformat()}, f)
+
+def invalidate_cache_if_needed():
+    """Invalidates cache if version mismatch."""
+    if CACHE_DIR.exists() and not check_cache_version():
+        logger.warning(f"Cache version mismatch (Current: {CODE_VERSION}). Invalidating old cache...")
+        try:
+            # We delete all parquet files in cache, but maybe keep raw data?
+            # The prompt implies cache invalidation. Assuming the processed parquet cache.
+            for f in CACHE_DIR.glob("*.parquet"):
+                f.unlink()
+            update_cache_version()
+        except Exception as e:
+            logger.error(f"Failed to invalidate cache: {e}")
 
 # ==================== DOWNLOAD HELPERS ====================
 async def download_file(session: ClientSession, url: str, save_path: Path, retries: int = 3) -> bool:
@@ -264,6 +302,11 @@ async def build_panel(end_date: date = None, max_symbols: int = 80):
     CACHE_DIR.mkdir(parents=True, exist_ok=True)
     DATA_DIR.mkdir(parents=True, exist_ok=True)
 
+    # Invalidate cache if version mismatch
+    invalidate_cache_if_needed()
+    # Ensure version file exists if we proceed
+    update_cache_version()
+
     active_symbols = SYMBOLS[:max_symbols]
     logger.info(f"Building panel with {len(active_symbols)} symbols (max={max_symbols})")
 
@@ -411,7 +454,7 @@ async def build_panel(end_date: date = None, max_symbols: int = 80):
     )
 
     meta = {
-        "version": "1.5",
+        "version": "1.6",
         "cutoff": END_DATE.isoformat(),
         "symbols": len(active_symbols),
         "universe_hash": hashlib.sha256("".join(active_symbols).encode()).hexdigest()[:16],
@@ -428,7 +471,7 @@ async def build_panel(end_date: date = None, max_symbols: int = 80):
 
 
 if __name__ == "__main__":
-    parser = argparse.ArgumentParser(description="Build Binance Perps Clean Panel v1.5")
+    parser = argparse.ArgumentParser(description="Build Binance Perps Clean Panel v1.6")
     parser.add_argument("--max-symbols", type=int, default=80, help="Fast test mode")
     parser.add_argument("--end-date", type=str, help="YYYY-MM-DD")
     args = parser.parse_args()
