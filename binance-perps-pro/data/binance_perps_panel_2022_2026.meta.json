@@ -1,0 +1,27 @@
+{
+  "version": "1.5",
+  "cutoff": "2022-02-01",
+  "symbols": 2,
+  "universe_hash": "91b03d70b96f060a",
+  "generated": "2026-02-23T16:32:01.860829",
+  "rows": 1534,
+  "size_mb": 0.1,
+  "fields": [
+    "timestamp",
+    "open",
+    "high",
+    "low",
+    "close",
+    "volume",
+    "funding_rate",
+    "mark_price",
+    "open_interest",
+    "symbol",
+    "is_active",
+    "dollar_volume",
+    "next_funding_rate",
+    "ret_1h",
+    "fwd_ret_1h"
+  ],
+  "start_date": "2022-01-01"
+}
