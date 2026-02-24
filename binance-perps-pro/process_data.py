@@ -24,7 +24,7 @@ import hashlib
 import json
 import logging
 import shutil
-from datetime import date, datetime, timedelta
+from datetime import date, datetime, timedelta, timezone
 from pathlib import Path
 
 import aiohttp
@@ -75,7 +75,11 @@ def update_cache_version():
     """Updates the cache version file."""
     CACHE_DIR.mkdir(parents=True, exist_ok=True)
     with open(CACHE_DIR / "version.json", "w") as f:
-        json.dump({"version": CODE_VERSION, "updated": datetime.utcnow().isoformat()}, f)
+        json.dump({
+            "version": CODE_VERSION,
+            "updated": datetime.now(timezone.utc).isoformat(),
+            "loader_version": "1.0.0"
+        }, f)
 
 def invalidate_cache_if_needed():
     """Invalidates cache if version mismatch."""
@@ -421,6 +425,11 @@ async def build_panel(end_date: date = None, max_symbols: int = 80):
             logger.warning(f"No klines found for {sym}, skipping...")
             continue
 
+        # Dynamic Start Date Handling:
+        # We join to the full grid (2022-01-01 -> Now).
+        # Periods before listing will have null OHLC and is_active=False.
+        # This preserves the full panel shape while gracefully handling different listing dates.
+
         df = (
             full_grid.lazy()
             .join(klines.lazy(), on="timestamp", how="left")
@@ -498,15 +507,16 @@ async def build_panel(end_date: date = None, max_symbols: int = 80):
     )
 
     meta = {
-        "version": "1.7",
+        "BUILD_VERSION": "v1.7",
+        "SNAPSHOT_DATE_TIME": datetime.now(timezone.utc).isoformat(),
+        "DATA_RANGE": f"2022-01-01 → {END_DATE.isoformat()}",
         "cutoff": END_DATE.isoformat(),
         "symbols": len(active_symbols),
         "universe_hash": hashlib.sha256("".join(active_symbols).encode()).hexdigest()[:16],
-        "generated": datetime.utcnow().isoformat(),
         "rows": len(panel),
         "size_mb": round(OUTPUT_PARQUET.stat().st_size / 1024**2, 1),
         "fields": panel.columns,
-        "start_date": "2022-01-01",
+        "loader_version": "1.0.0"
     }
     with open(OUTPUT_PARQUET.with_suffix(".meta.json"), "w") as f:
         json.dump(meta, f, indent=2)

@@ -1,9 +1,10 @@
 {
-  "version": "1.7",
-  "cutoff": "2022-01-05",
+  "BUILD_VERSION": "v1.7",
+  "SNAPSHOT_DATE_TIME": "2026-02-24T12:18:10.253994+00:00",
+  "DATA_RANGE": "2022-01-01 \u2192 2022-01-02",
+  "cutoff": "2022-01-02",
   "symbols": 1,
   "universe_hash": "19aa16aed07f38e9",
-  "generated": "2026-02-24T01:50:26.989984",
   "rows": 119,
   "size_mb": 0.0,
   "fields": [
@@ -23,5 +24,5 @@
     "ret_1h",
     "fwd_ret_1h"
   ],
-  "start_date": "2022-01-01"
+  "loader_version": "1.0.0"
 }
