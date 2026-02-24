@@ -1,11 +1,11 @@
 {
-  "version": "1.6",
+  "version": "1.7",
   "cutoff": "2022-01-05",
-  "symbols": 80,
-  "universe_hash": "579ff35fe015ffed",
-  "generated": "2026-02-23T16:50:56.276288",
-  "rows": 8211,
-  "size_mb": 0.3,
+  "symbols": 1,
+  "universe_hash": "19aa16aed07f38e9",
+  "generated": "2026-02-24T01:50:26.989984",
+  "rows": 119,
+  "size_mb": 0.0,
   "fields": [
     "timestamp",
     "open",
