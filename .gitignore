@@ -2,4 +2,6 @@
 .vscode
 binance-perps-pro/raw_data
 binance-perps-pro/cache
+
+temp_check/
 **/.DS_Store
