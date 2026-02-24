@@ -1,11 +1,41 @@
 
 
-# ⚠️ Minor Issues to fix (Not Required Changes)
+# ⚠️ Minor Notes (Not Required Changes)
 
 ⸻
 
-binance-perps-pro/process_data.py:461: DeprecationWarning: datetime.datetime.utcnow() is deprecated and scheduled for removal in a future version. Use timezone-aware objects to represent datetimes in UTC: datetime.datetime.now(datetime.UTC).
-  "generated": datetime.utcnow().isoformat()
+2️⃣ Cache invalidation (future)
+
+If you change:
+	•	schema
+	•	features
+	•	logic
+
+old cache persists.
+
+If needed later:
+
+cache/v1_3_BTCUSDT.parquet
+
+Not urgent.
+
+⸻
+
+3️⃣ Funding column null bursts
+
+Funding occurs every 8h → nulls expected.
+
+This is correct.
+
+⸻
+
+4️⃣ Memory profile
+
+With 80 symbols:
+	•	RAM ~ 2–3 GB peak
+	•	safe on 8GB+
+
+⸻
 
 🟢 Performance Expectations
 
