@@ -9,8 +9,39 @@ A production-grade, backtest-ready hourly dataset for the top 80 liquid USDT-M p
 - **Resolution:** Hourly (1h)
 - **Format:** Parquet (ZSTD compressed, optimized schema)
 - **Precision:** Float64 for all financial columns, correct timestamps (UTC ms)
-- **Alignment:** Zero lookahead; Funding Rates & Premium Index aligned to hourly grid; `is_active` status handled automatically.
+- **Alignment:** Zero lookahead; Funding Rates & Mark Price aligned to hourly grid; `is_active` status handled automatically.
 - **UTC Enforcement:** All timestamps are strictly UTC (timezone-aware) to avoid ambiguity.
+
+## Data Sources & Methodology
+
+### 1. Data Sources
+All data is sourced directly from the official **Binance Public Data Repository** (`data.binance.vision`). We strive for the highest fidelity by using the following specific paths:
+
+- **OHLCV:** `data/futures/um/monthly/klines/{symbol}/1h/`
+  - *Fallback:* `data/futures/um/daily/klines/{symbol}/1h/` (used if monthly missing, e.g., current month)
+- **Funding Rates:** `data/futures/um/monthly/fundingRate/{symbol}/`
+- **Mark Price:** `data/futures/um/monthly/markPriceKlines/{symbol}/1h/`
+  - *Note:* We use `markPriceKlines` instead of `premiumIndex` to ensure consistent monthly file availability and kline-structured data.
+- **Open Interest:** `data/futures/um/daily/metrics/{symbol}/`
+  - *Note:* Binance **does not** provide monthly archives for metrics/Open Interest. The script automatically detects this and downloads daily files for the entire history. This is expected behavior.
+
+### 2. Methodology & Cleaning
+We apply a rigorous cleaning pipeline to transform raw dumps into a "Quant-Ready" panel:
+
+1.  **Headerless CSV Handling:** Binance kline files (OHLC, Mark Price) are headerless. We manually enforce the schema (`open_time`, `open`, `high`, `low`, `close`, `volume`, etc.) to prevent data corruption.
+2.  **UTC & Timestamp Normalization:**
+    -   Raw timestamps (milliseconds) are parsed strictly as UTC.
+    -   Funding Rate and Mark Price timestamps are **truncated to the hour** (`.dt.truncate("1h")`) to align perfectly with the hourly candle grid. This solves the issue of sparse/misaligned funding rows.
+3.  **Strict Typing:** All price/volume columns are cast to `Float64` (double precision) to avoid rounding errors common with `Float32`.
+4.  **Hourly Grid Enforcement:** We generate a complete hourly timestamp grid from `2022-01-01` to `Now`.
+    -   **Left Join:** Data is joined onto this grid.
+    -   **Missing Data:** If a symbol has no data for a timestamp (e.g., prior to listing, or exchange downtime), the row remains with `null` values. We **do not** silently forward-fill prices, as this introduces synthetic artifacts.
+5.  **Metrics Fallback:** For Open Interest, since monthly files are unavailable, the system robustly iterates through daily files, with retry logic for intermittent server errors (5xx).
+
+### 3. Disclaimers
+-   **Lagged Features:** The dataset includes engineered features like `ret_1h` (1-hour return) and `fwd_ret_1h`. Naturally, the **first timestamp** for every symbol will have `null` for backward-looking features (returns) and the **last timestamp** will have `null` for forward-looking features (targets).
+-   **Open Interest:** Sourced from `sum_open_interest_value` (USD Notional) in the Binance `metrics` files.
+-   **Factors:** We focus on the core "Quant Panel" columns (OHLCV, Funding, Mark, OI). High-frequency data (Tickers, Trades, Book Depth) is intentionally excluded to maintain a lightweight, hourly resolution suitable for backtesting.
 
 ## Quick Start
 

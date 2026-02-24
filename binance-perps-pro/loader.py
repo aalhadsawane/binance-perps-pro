@@ -3,9 +3,16 @@ from pathlib import Path
 
 def load_panel(start_date: str = None, end_date: str = None, symbols: list[str] = None) -> pl.LazyFrame:
     """
-    Efficiently loads the Binance Perps Clean Panel (Parquet) with predicate pushdown.
+    Efficiently loads the latest Binance Perps Clean Panel (Parquet) with predicate pushdown.
     """
-    path = Path(__file__).parent / "data/binance_perps_panel_2022_2026.parquet"
+    data_dir = Path(__file__).parent / "data"
+    # Find the latest parquet file matching the pattern
+    files = sorted(data_dir.glob("binance_perps_panel_*.parquet"))
+
+    if not files:
+        raise FileNotFoundError(f"No panel parquet file found in {data_dir}. Run process_data.py first.")
+
+    path = files[-1]  # Pick the latest one
     lf = pl.scan_parquet(path)
 
     if symbols:

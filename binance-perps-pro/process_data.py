@@ -41,7 +41,8 @@ logger = logging.getLogger(__name__)
 BASE_URL = "https://data.binance.vision/"   # clean & correct
 DATA_DIR = Path("raw_data")
 CACHE_DIR = Path("cache")
-OUTPUT_PARQUET = Path("data/binance_perps_panel_2022_2026.parquet")
+# Filename includes present date for versioning
+OUTPUT_PARQUET = Path(f"data/binance_perps_panel_2022_{datetime.now(timezone.utc).year}_{datetime.now(timezone.utc).strftime('%Y%m%d')}.parquet")
 START_DATE = date(2022, 1, 1)
 
 # Version string to invalidate cache if logic changes
@@ -175,6 +176,7 @@ async def download_all_for_symbol(
             # Open Interest is in 'metrics'. Monthly metrics often missing, so we skip monthly attempt?
             # User investigation showed 404 for metrics monthly.
             # Let's NOT try monthly for OI/metrics to avoid wasting time.
+            # Explicitly falling back to daily is expected behavior for metrics.
             url_monthly = None
         else:
             raise ValueError(f"Unknown data_type: {data_type}")
