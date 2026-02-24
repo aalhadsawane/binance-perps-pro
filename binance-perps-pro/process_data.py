@@ -23,6 +23,7 @@ import asyncio
 import hashlib
 import json
 import logging
+import re
 import shutil
 from datetime import date, datetime, timedelta, timezone
 from pathlib import Path
@@ -51,10 +52,11 @@ CODE_VERSION = "1.7"
 # Robust symbols.txt path
 SYMBOLS_FILE = Path(__file__).parent / "symbols.txt"
 SYMBOLS = [
-    line.strip()
-    for line in SYMBOLS_FILE.read_text().splitlines()
-    if line.strip() and not line.startswith("#")
+    s for s in re.split(r"[,\s]+", SYMBOLS_FILE.read_text())
+    if s and not s.startswith("#")
 ]
+# Deduplicate symbols
+SYMBOLS = sorted(list(set(SYMBOLS)))
 
 DOWNLOAD_SEMAPHORE = asyncio.Semaphore(12)
 

@@ -60,6 +60,13 @@ python process_data.py
 python process_data.py --max-symbols 2 --end-date 2022-02-01
 ```
 
+#### Customizing the Universe (Two Ways)
+1. **At Build Time (Master Universe):** Edit the `symbols.txt` file to define the complete list of symbols you want to download and include in the Parquet file. The default file contains ~100 top liquid symbols.
+   - The script parses `symbols.txt` (supporting commas, spaces, or newlines) and builds the dataset based on this list.
+   - **Note:** `symbols.txt` defines the *content* of the dataset. If you modify it, you must re-run `process_data.py` to rebuild the panel.
+
+2. **At Load Time (Runtime Subset):** Use the `load_panel` function (see below) to load a *subset* of the built data into memory. This is faster and avoids loading the entire 1GB+ file if you only need specific assets.
+
 ### 3. Load Data
 Use the included lazy loader for efficient access. **Ensure `loader.py` is in your Python path or working directory.**
 
