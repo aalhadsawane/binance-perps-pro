@@ -1,0 +1,12 @@
+2026-02-25 12:03:54,926 | INFO | Building panel with 1 symbols (max=1)
+2026-02-25 12:03:54,927 | INFO | Fetching Exchange Info...
+2026-02-25 12:03:55,030 | WARNING | Failed to fetch exchange info: 451
+Downloading raw files:   0%|          | 0/4 [00:00<?, ?it/s]2026-02-25 12:03:55,042 | INFO | ✅ Downloaded monthly fundingRate for 1INCHUSDT 2022-01
+2026-02-25 12:03:55,042 | INFO | ✅ Downloaded monthly klines for 1INCHUSDT 2022-01
+2026-02-25 12:03:55,042 | INFO | ✅ Downloaded monthly markPrice for 1INCHUSDT 2022-01
+Downloading raw files: 100%|██████████| 4/4 [00:00<00:00, 3255.82it/s]
+2026-02-25 12:03:55,043 | INFO | ✅ Downloads complete. Building panel...
+Processing symbols:   0%|          | 0/1 [00:00<?, ?it/s]2026-02-25 12:03:55,065 | INFO | Loaded cache for 1INCHUSDT
+Processing symbols: 100%|██████████| 1/1 [00:00<00:00, 48.66it/s]
+2026-02-25 12:03:55,078 | INFO | ✅ Symbol Information saved: data/symbol_information.parquet
+2026-02-25 12:03:55,080 | INFO | ✅ SUCCESS! Parquet: data/binance_perps_panel_2022_2026_20260225.parquet (0.0 MB)

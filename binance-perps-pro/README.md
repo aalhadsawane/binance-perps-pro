@@ -10,6 +10,7 @@ A production-grade, backtest-ready hourly dataset for the top 80 liquid USDT-M p
 - **Format:** Parquet (ZSTD compressed, optimized schema)
 - **Precision:** Float64 for all financial columns, correct timestamps (UTC ms)
 - **Alignment:** Zero lookahead; Funding Rates & Mark Price aligned to hourly grid; `is_active` status handled automatically.
+- **Sort Order:** Primary Sort: `symbol` (ASC), Secondary Sort: `timestamp` (ASC).
 - **UTC Enforcement:** All timestamps are strictly UTC (timezone-aware) to avoid ambiguity.
 
 ## Data Sources & Methodology
@@ -42,6 +43,26 @@ We apply a rigorous cleaning pipeline to transform raw dumps into a "Quant-Ready
 -   **Lagged Features:** The dataset includes engineered features like `ret_1h` (1-hour return) and `fwd_ret_1h`. Naturally, the **first timestamp** for every symbol will have `null` for backward-looking features (returns) and the **last timestamp** will have `null` for forward-looking features (targets).
 -   **Open Interest:** Sourced from `sum_open_interest_value` (USD Notional) in the Binance `metrics` files.
 -   **Factors:** We focus on the core "Quant Panel" columns (OHLCV, Funding, Mark, OI). High-frequency data (Tickers, Trades, Book Depth) is intentionally excluded to maintain a lightweight, hourly resolution suitable for backtesting.
+
+## Symbol Metadata
+A separate file `data/symbol_information.parquet` contains static and statistical metadata for the universe.
+
+| Column | Description | Source |
+|--------|-------------|--------|
+| `symbol` | Ticker | Binance API |
+| `base_asset` | Base Currency | Binance API |
+| `quote_asset` | Quote Currency | Binance API |
+| `listing_time` | Listing Date | Binance API (`onboardDate`) |
+| `delivery_time` | Delivery/Delisting Date | Binance API (`deliveryDate`) |
+| `status` | Trading Status | Binance API |
+| `tick_size` | Min Price Increment | Binance API |
+| `min_qty` | Min Quantity | Binance API |
+| `min_notional` | Min Trade Value | Binance API |
+| `first_trade_time` | First candle timestamp | Derived from Data |
+| `last_trade_time` | Last candle timestamp | Derived from Data |
+| `first_funding_time`| First funding timestamp| Derived from Data |
+
+Use `loader.load_metadata()` to access this file.
 
 ## Quick Start
 
