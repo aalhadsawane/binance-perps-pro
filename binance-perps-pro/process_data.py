@@ -42,11 +42,7 @@ logger = logging.getLogger(__name__)
 
 # ==================== CONFIG ====================
 BASE_URL = "https://data.binance.vision/"   # clean & correct
-# List of API endpoints to try (Primary -> Failover)
-API_ENDPOINTS = [
-    "https://fapi.binance.com/fapi/v1/exchangeInfo",
-    "https://testnet.binancefuture.com/fapi/v1/exchangeInfo"
-]
+API_URL = "https://fapi.binance.com/fapi/v1/exchangeInfo"
 DATA_DIR = Path("raw_data")
 CACHE_DIR = Path("cache")
 # Filename includes present date for versioning
@@ -55,10 +51,11 @@ OUTPUT_METADATA_PARQUET = Path(f"data/symbol_information.parquet")
 START_DATE = date(2022, 1, 1)
 
 # Version string to invalidate cache if logic changes
-CODE_VERSION = "1.8"
+CODE_VERSION = "1.9"
 
-# Robust symbols.txt path
+# Robust symbols.txt & delistings.csv path
 SYMBOLS_FILE = Path(__file__).parent / "symbols.txt"
+DELISTINGS_FILE = Path(__file__).parent / "delistings.csv"
 SYMBOLS = [
     s for s in re.split(r"[,\s]+", SYMBOLS_FILE.read_text())
     if s and not s.startswith("#")
@@ -363,28 +360,27 @@ def parse_oi_zip(path: Path) -> pl.DataFrame:
 
 # ==================== SYMBOL METADATA ====================
 async def fetch_exchange_info():
-    """Fetches symbol metadata from Binance Futures API with fallback."""
+    """Fetches symbol metadata from Binance Futures API."""
     headers = {
         "User-Agent": "Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/120.0.0.0 Safari/537.36"
     }
     async with ClientSession(headers=headers) as session:
-        for url in API_ENDPOINTS:
-            try:
-                logger.info(f"Fetching metadata from: {url}")
-                async with session.get(url, timeout=10) as resp:
-                    if resp.status == 200:
-                        data = await resp.json()
-                        logger.info("✅ Exchange Info fetched successfully.")
-                        return data
-                    elif resp.status == 451:
-                        logger.warning(f"⚠️ Geo-blocked (451) at {url}. You may be in a restricted region (e.g. US).")
-                    else:
-                        logger.warning(f"Failed to fetch exchange info from {url}: HTTP {resp.status}")
-            except Exception as e:
-                logger.warning(f"Error fetching from {url}: {e}")
-
-    logger.error("❌ Could not fetch exchange metadata from any source. Metadata columns will be null.")
-    return None
+        try:
+            logger.info(f"Fetching metadata from: {API_URL}")
+            async with session.get(API_URL, timeout=10) as resp:
+                if resp.status == 200:
+                    data = await resp.json()
+                    logger.info("✅ Exchange Info fetched successfully.")
+                    return data
+                elif resp.status == 451:
+                    logger.warning(f"⚠️ Geo-blocked (451) at {API_URL}. You may be in a restricted region (e.g. US). Metadata will be null.")
+                    return None
+                else:
+                    logger.warning(f"Failed to fetch exchange info: {resp.status}")
+                    return None
+        except Exception as e:
+            logger.warning(f"Error fetching exchange info: {e}")
+            return None
 
 def extract_symbol_metadata(info: dict, symbols: list) -> pl.DataFrame:
     """Parses exchange info into a Polars DataFrame."""
@@ -661,13 +657,33 @@ async def build_panel(end_date: date = None, max_symbols: int = 80):
         if col not in metadata_df.columns:
             metadata_df = metadata_df.with_columns(pl.lit(None).cast(dtype).alias(col))
 
-    final_metadata = (
-        metadata_df.join(stats_df, on="symbol", how="full")
-        .with_columns([
-            pl.col("listing_time").cast(pl.Datetime("ms")),
-            pl.col("delivery_time").cast(pl.Datetime("ms")),
-        ])
-    )
+    # Manual Delistings Override
+    delistings_df = None
+    if DELISTINGS_FILE.exists():
+        try:
+            delistings_df = pl.read_csv(DELISTINGS_FILE, ignore_errors=True)
+            # Ensure proper casting
+            delistings_df = delistings_df.with_columns([
+                pl.col("symbol").cast(pl.Utf8),
+                pl.col("delisting_time").str.strptime(pl.Datetime("ms"), format="%Y-%m-%dT%H:%M:%S", strict=False)
+            ]).select(["symbol", "delisting_time"])
+            logger.info(f"Loaded {len(delistings_df)} manual delistings.")
+        except Exception as e:
+            logger.warning(f"Failed to load delistings.csv: {e}")
+
+    final_metadata = metadata_df.join(stats_df, on="symbol", how="full")
+
+    if delistings_df is not None:
+        final_metadata = final_metadata.join(delistings_df, on="symbol", how="left")
+        # Override delivery_time with manual delisting_time if present
+        final_metadata = final_metadata.with_columns(
+            pl.coalesce(["delisting_time", "delivery_time"]).alias("delivery_time")
+        ).drop("delisting_time")
+
+    final_metadata = final_metadata.with_columns([
+        pl.col("listing_time").cast(pl.Datetime("ms")),
+        pl.col("delivery_time").cast(pl.Datetime("ms")),
+    ])
 
     final_metadata.write_parquet(OUTPUT_METADATA_PARQUET)
     logger.info(f"✅ Symbol Information saved: {OUTPUT_METADATA_PARQUET}")

@@ -67,8 +67,13 @@ Use `loader.load_metadata()` to access this file.
 ### Troubleshooting: Missing Metadata (Nulls)
 The `symbol_information.parquet` file relies on the Binance Futures API to populate contract specifications (tick size, leverage, etc.).
 - **Issue:** If you see `null` in fields like `tick_size` or `status`, it is likely because the script is running in a **Restricted Jurisdiction (e.g., USA)** where `fapi.binance.com` is blocked (HTTP 451).
-- **Fallback:** The script attempts to use the **Testnet** API (`testnet.binancefuture.com`) as a fallback. However, testnet symbols may not match mainnet symbols (e.g., BTCUSDT might not be listed or have different specs).
-- **Solution:** To get complete metadata, run the `process_data.py` script from a non-restricted IP address (VPN or VPS) or provide a custom proxy if you are technically inclined. The core OHLCV data (from `data.binance.vision`) is **NOT** geo-blocked and will work regardless.
+- **Solution:** To get complete metadata, **you must run the `process_data.py` script from a non-restricted IP address** (outside the US). The core OHLCV data (from `data.binance.vision`) is NOT geo-blocked and will work regardless, but the metadata file will be incomplete without API access.
+
+### Manual Delistings
+Since the API may not accurately reflect the "Delisting Time" for already removed symbols, you can provide a manual override file:
+1. Create `delistings.csv` in the project root.
+2. Format: `symbol,delisting_time` (e.g., `LUNAUSDT,2022-05-13T00:00:00`).
+3. Run `process_data.py`. The script will merge this data into the `delivery_time` column of `symbol_information.parquet`.
 
 ## Quick Start
 
