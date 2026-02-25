@@ -10,6 +10,7 @@ A production-grade, backtest-ready hourly dataset for the top 80 liquid USDT-M p
 - **Format:** Parquet (ZSTD compressed, optimized schema)
 - **Precision:** Float64 for all financial columns, correct timestamps (UTC ms)
 - **Alignment:** Zero lookahead; Funding Rates & Mark Price aligned to hourly grid; `is_active` status handled automatically.
+- **Sort Order:** Primary Sort: `symbol` (ASC), Secondary Sort: `timestamp` (ASC).
 - **UTC Enforcement:** All timestamps are strictly UTC (timezone-aware) to avoid ambiguity.
 
 ## Data Sources & Methodology
@@ -43,6 +44,26 @@ We apply a rigorous cleaning pipeline to transform raw dumps into a "Quant-Ready
 -   **Open Interest:** Sourced from `sum_open_interest_value` (USD Notional) in the Binance `metrics` files.
 -   **Factors:** We focus on the core "Quant Panel" columns (OHLCV, Funding, Mark, OI). High-frequency data (Tickers, Trades, Book Depth) is intentionally excluded to maintain a lightweight, hourly resolution suitable for backtesting.
 
+## Symbol Metadata
+A separate file `data/symbol_information.parquet` contains static and statistical metadata for the universe.
+
+| Column | Description | Source |
+|--------|-------------|--------|
+| `symbol` | Ticker | Binance API |
+| `base_asset` | Base Currency | Binance API |
+| `quote_asset` | Quote Currency | Binance API |
+| `listing_time` | Listing Date | Binance API (`onboardDate`) |
+| `delivery_time` | Delivery/Delisting Date | Binance API (`deliveryDate`) |
+| `status` | Trading Status | Binance API |
+| `tick_size` | Min Price Increment | Binance API |
+| `min_qty` | Min Quantity | Binance API |
+| `min_notional` | Min Trade Value | Binance API |
+| `first_trade_time` | First candle timestamp | Derived from Data |
+| `last_trade_time` | Last candle timestamp | Derived from Data |
+| `first_funding_time`| First funding timestamp| Derived from Data |
+
+Use `loader.load_metadata()` to access this file.
+
 ## Quick Start
 
 ### 1. Install Dependencies
@@ -59,6 +80,13 @@ python process_data.py
 # Or run a fast test (first 2 symbols, 1 month)
 python process_data.py --max-symbols 2 --end-date 2022-02-01
 ```
+
+#### Customizing the Universe (Two Ways)
+1. **At Build Time (Master Universe):** Edit the `symbols.txt` file to define the complete list of symbols you want to download and include in the Parquet file. The default file contains ~100 top liquid symbols.
+   - The script parses `symbols.txt` (supporting commas, spaces, or newlines) and builds the dataset based on this list.
+   - **Note:** `symbols.txt` defines the *content* of the dataset. If you modify it, you must re-run `process_data.py` to rebuild the panel.
+
+2. **At Load Time (Runtime Subset):** Use the `load_panel` function (see below) to load a *subset* of the built data into memory. This is faster and avoids loading the entire 1GB+ file if you only need specific assets.
 
 ### 3. Load Data
 Use the included lazy loader for efficient access. **Ensure `loader.py` is in your Python path or working directory.**

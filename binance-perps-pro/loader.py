@@ -25,3 +25,13 @@ def load_panel(start_date: str = None, end_date: str = None, symbols: list[str] 
         lf = lf.filter(pl.col("timestamp") <= pl.lit(end_date).cast(pl.Datetime))
 
     return lf
+
+def load_metadata() -> pl.DataFrame:
+    """
+    Loads the Symbol Information (Metadata) Parquet file.
+    """
+    path = Path(__file__).parent / "data/symbol_information.parquet"
+    if not path.exists():
+        raise FileNotFoundError(f"Metadata file not found at {path}. Run process_data.py first.")
+
+    return pl.read_parquet(path)

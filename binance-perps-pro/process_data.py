@@ -1,6 +1,8 @@
 #!/usr/bin/env python3
 """
-Binance USDT-M Perpetual Clean Panel Builder – v1.7 (PRODUCTION)
+Binance USDT-M Perpetual Clean Panel Builder – v1.8 (PRODUCTION)
+- Fixed: Sort Order (Symbol ASC, Timestamp ASC)
+- New: Symbol Metadata Generation (symbol_information.parquet)
 - Fixed: Cache Invalidation (Schema/Version changes)
 - Fixed: pl.datetime_range (Polars 1.x compatibility)
 - Fixed: BASE_URL clean (no ?prefix=)
@@ -23,6 +25,7 @@ import asyncio
 import hashlib
 import json
 import logging
+import re
 import shutil
 from datetime import date, datetime, timedelta, timezone
 from pathlib import Path
@@ -39,22 +42,25 @@ logger = logging.getLogger(__name__)
 
 # ==================== CONFIG ====================
 BASE_URL = "https://data.binance.vision/"   # clean & correct
+API_URL = "https://fapi.binance.com/fapi/v1/exchangeInfo"
 DATA_DIR = Path("raw_data")
 CACHE_DIR = Path("cache")
 # Filename includes present date for versioning
 OUTPUT_PARQUET = Path(f"data/binance_perps_panel_2022_{datetime.now(timezone.utc).year}_{datetime.now(timezone.utc).strftime('%Y%m%d')}.parquet")
+OUTPUT_METADATA_PARQUET = Path(f"data/symbol_information.parquet")
 START_DATE = date(2022, 1, 1)
 
 # Version string to invalidate cache if logic changes
-CODE_VERSION = "1.7"
+CODE_VERSION = "1.8"
 
 # Robust symbols.txt path
 SYMBOLS_FILE = Path(__file__).parent / "symbols.txt"
 SYMBOLS = [
-    line.strip()
-    for line in SYMBOLS_FILE.read_text().splitlines()
-    if line.strip() and not line.startswith("#")
+    s for s in re.split(r"[,\s]+", SYMBOLS_FILE.read_text())
+    if s and not s.startswith("#")
 ]
+# Deduplicate symbols
+SYMBOLS = sorted(list(set(SYMBOLS)))
 
 DOWNLOAD_SEMAPHORE = asyncio.Semaphore(12)
 
@@ -351,6 +357,75 @@ def parse_oi_zip(path: Path) -> pl.DataFrame:
         .agg(pl.col("open_interest").last())
     )
 
+# ==================== SYMBOL METADATA ====================
+async def fetch_exchange_info():
+    """Fetches symbol metadata from Binance Futures API."""
+    async with ClientSession() as session:
+        try:
+            async with session.get(API_URL, timeout=10) as resp:
+                if resp.status == 200:
+                    return await resp.json()
+                else:
+                    logger.warning(f"Failed to fetch exchange info: {resp.status}")
+                    return None
+        except Exception as e:
+            logger.warning(f"Error fetching exchange info: {e}")
+            return None
+
+def extract_symbol_metadata(info: dict, symbols: list) -> pl.DataFrame:
+    """Parses exchange info into a Polars DataFrame."""
+    if not info or "symbols" not in info:
+        return pl.DataFrame(schema=["symbol"])
+
+    rows = []
+    for s in info["symbols"]:
+        if s["symbol"] in symbols:
+            # Parse Filters
+            tick_size = None
+            lot_size = None
+            min_qty = None
+            min_notional = None
+
+            for f in s["filters"]:
+                if f["filterType"] == "PRICE_FILTER":
+                    tick_size = float(f["tickSize"])
+                elif f["filterType"] == "LOT_SIZE":
+                    lot_size = float(f["stepSize"])
+                    min_qty = float(f["minQty"])
+                elif f["filterType"] == "MIN_NOTIONAL":
+                    min_notional = float(f.get("notional", 0))
+
+            rows.append({
+                "symbol": s["symbol"],
+                "base_asset": s["baseAsset"],
+                "quote_asset": s["quoteAsset"],
+                "margin_asset": s["marginAsset"],
+                "contract_type": s["contractType"],
+                "listing_time": datetime.fromtimestamp(s["onboardDate"] / 1000, timezone.utc) if s.get("onboardDate") else None,
+                "delivery_time": datetime.fromtimestamp(s["deliveryDate"] / 1000, timezone.utc) if s.get("deliveryDate") and s["deliveryDate"] < 4102444800000 else None,
+                "status": s["status"],
+                "tick_size": tick_size,
+                "lot_size": lot_size,
+                "min_qty": min_qty,
+                "min_notional": min_notional,
+                "max_leverage": None # Not available publicly without auth
+            })
+
+    return pl.DataFrame(rows, schema={
+        "symbol": pl.Categorical,
+        "base_asset": pl.Utf8,
+        "quote_asset": pl.Utf8,
+        "margin_asset": pl.Utf8,
+        "contract_type": pl.Utf8,
+        "listing_time": pl.Datetime("ms"),
+        "delivery_time": pl.Datetime("ms"),
+        "status": pl.Utf8,
+        "tick_size": pl.Float64,
+        "lot_size": pl.Float64,
+        "min_qty": pl.Float64,
+        "min_notional": pl.Float64,
+        "max_leverage": pl.Float64
+    })
 
 # ==================== MAIN PIPELINE ====================
 async def build_panel(end_date: date = None, max_symbols: int = 80):
@@ -363,6 +438,11 @@ async def build_panel(end_date: date = None, max_symbols: int = 80):
 
     active_symbols = SYMBOLS[:max_symbols]
     logger.info(f"Building panel with {len(active_symbols)} symbols (max={max_symbols})")
+
+    # Fetch Metadata Early
+    logger.info("Fetching Exchange Info...")
+    exchange_info = await fetch_exchange_info()
+    metadata_df = extract_symbol_metadata(exchange_info, active_symbols)
 
     # === DOWNLOAD PHASE ===
     async with ClientSession() as session:
@@ -388,6 +468,10 @@ async def build_panel(end_date: date = None, max_symbols: int = 80):
     )
 
     panels = []
+
+    # Store stats for metadata
+    stats = []
+
     for sym in tqdm(active_symbols, desc="Processing symbols"):   # ← tqdm (sync)
         cache_path = CACHE_DIR / f"{sym}.parquet"
 
@@ -400,6 +484,16 @@ async def build_panel(end_date: date = None, max_symbols: int = 80):
                 else:
                     logger.info(f"Loaded cache for {sym}")
                     panels.append(df)
+
+                    # Collect Stats
+                    valid_df = df.filter(pl.col("is_active"))
+                    if not valid_df.is_empty():
+                        stats.append({
+                            "symbol": sym,
+                            "first_trade_time": valid_df["timestamp"].min(),
+                            "last_trade_time": valid_df["timestamp"].max(),
+                            "first_funding_time": df.filter(pl.col("funding_rate").is_not_null())["timestamp"].min()
+                        })
                     continue
             except Exception:
                 logger.warning(f"Corrupt cache for {sym}, rebuilding...")
@@ -470,6 +564,14 @@ async def build_panel(end_date: date = None, max_symbols: int = 80):
 
         valid_rows = df.filter(pl.col("is_active"))
         if not valid_rows.is_empty():
+            # Collect Stats
+            stats.append({
+                "symbol": sym,
+                "first_trade_time": valid_df["timestamp"].min() if 'valid_df' in locals() else valid_rows["timestamp"].min(),
+                "last_trade_time": valid_df["timestamp"].max() if 'valid_df' in locals() else valid_rows["timestamp"].max(),
+                "first_funding_time": df.filter(pl.col("funding_rate").is_not_null())["timestamp"].min()
+            })
+
             high_ok = valid_rows.select(
                 (pl.col("high") >= pl.max_horizontal("open", "low", "close")).all()
             ).item()
@@ -490,7 +592,8 @@ async def build_panel(end_date: date = None, max_symbols: int = 80):
         logger.error("No data processed!")
         return
 
-    panel = pl.concat(panels, how="vertical").sort(["timestamp", "symbol"])
+    # SORT ORDER UPDATE: Symbol ASC, Timestamp ASC
+    panel = pl.concat(panels, how="vertical").sort(["symbol", "timestamp"])
 
     panel = panel.with_columns([
         pl.col(["open", "high", "low", "close", "volume", "funding_rate", "mark_price",
@@ -508,8 +611,55 @@ async def build_panel(end_date: date = None, max_symbols: int = 80):
         row_group_size=750_000,
     )
 
+    # === BUILD & SAVE SYMBOL INFORMATION ===
+    stats_df = pl.DataFrame(stats, schema={
+        "symbol": pl.Utf8,
+        "first_trade_time": pl.Datetime("ms"),
+        "last_trade_time": pl.Datetime("ms"),
+        "first_funding_time": pl.Datetime("ms")
+    })
+
+    # Cast symbol to categorical for join if needed, but strings are safer for metadata
+    # Join with API metadata
+    # Ensure symbol col is compatible
+    metadata_df = metadata_df.with_columns(pl.col("symbol").cast(pl.Utf8))
+
+    # If API fetch failed (451 Unavailable), metadata_df only has "symbol".
+    # We must handle missing columns gracefully.
+
+    # Define expected schema columns to ensure they exist before casting
+    expected_cols = {
+        "listing_time": pl.Datetime("ms"),
+        "delivery_time": pl.Datetime("ms"),
+        "base_asset": pl.Utf8,
+        "quote_asset": pl.Utf8,
+        "margin_asset": pl.Utf8,
+        "contract_type": pl.Utf8,
+        "status": pl.Utf8,
+        "tick_size": pl.Float64,
+        "lot_size": pl.Float64,
+        "min_qty": pl.Float64,
+        "min_notional": pl.Float64,
+        "max_leverage": pl.Float64
+    }
+
+    for col, dtype in expected_cols.items():
+        if col not in metadata_df.columns:
+            metadata_df = metadata_df.with_columns(pl.lit(None).cast(dtype).alias(col))
+
+    final_metadata = (
+        metadata_df.join(stats_df, on="symbol", how="full")
+        .with_columns([
+            pl.col("listing_time").cast(pl.Datetime("ms")),
+            pl.col("delivery_time").cast(pl.Datetime("ms")),
+        ])
+    )
+
+    final_metadata.write_parquet(OUTPUT_METADATA_PARQUET)
+    logger.info(f"✅ Symbol Information saved: {OUTPUT_METADATA_PARQUET}")
+
     meta = {
-        "BUILD_VERSION": "v1.7",
+        "BUILD_VERSION": "v1.8",
         "SNAPSHOT_DATE_TIME": datetime.now(timezone.utc).isoformat(),
         "DATA_RANGE": f"2022-01-01 → {END_DATE.isoformat()}",
         "cutoff": END_DATE.isoformat(),
@@ -527,7 +677,7 @@ async def build_panel(end_date: date = None, max_symbols: int = 80):
 
 
 if __name__ == "__main__":
-    parser = argparse.ArgumentParser(description="Build Binance Perps Clean Panel v1.7")
+    parser = argparse.ArgumentParser(description="Build Binance Perps Clean Panel v1.8")
     parser.add_argument("--max-symbols", type=int, default=80, help="Fast test mode")
     parser.add_argument("--end-date", type=str, help="YYYY-MM-DD")
     args = parser.parse_args()

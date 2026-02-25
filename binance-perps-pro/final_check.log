@@ -1,0 +1,42 @@
+2026-02-25 12:02:50,727 | WARNING | Cache version mismatch (Current: 1.8). Invalidating old cache...
+2026-02-25 12:02:50,728 | INFO | Building panel with 1 symbols (max=1)
+2026-02-25 12:02:50,729 | INFO | Fetching Exchange Info...
+2026-02-25 12:02:51,233 | WARNING | Failed to fetch exchange info: 451
+Downloading raw files:   0%|          | 0/4 [00:00<?, ?it/s]2026-02-25 12:02:51,666 | INFO | ✅ Downloaded monthly klines for 1INCHUSDT 2022-01
+Downloading raw files:  25%|██▌       | 1/4 [00:00<00:01,  2.48it/s]2026-02-25 12:02:51,801 | INFO | ✅ Downloaded monthly fundingRate for 1INCHUSDT 2022-01
+Downloading raw files:  50%|█████     | 2/4 [00:00<00:00,  4.08it/s]2026-02-25 12:02:51,847 | INFO | ✅ Downloaded monthly markPrice for 1INCHUSDT 2022-01
+Downloading raw files: 100%|██████████| 4/4 [00:02<00:00,  1.57it/s]Downloading raw files: 100%|██████████| 4/4 [00:02<00:00,  1.76it/s]
+2026-02-25 12:02:53,538 | INFO | ✅ Downloads complete. Building panel...
+Processing symbols:   0%|          | 0/1 [00:00<?, ?it/s]2026-02-25 12:02:53,686 | INFO | Cached 1INCHUSDT
+Processing symbols: 100%|██████████| 1/1 [00:00<00:00,  8.15it/s]Processing symbols: 100%|██████████| 1/1 [00:00<00:00,  8.13it/s]
+/app/binance-perps-pro/process_data.py:628: DeprecationWarning: use of `how='outer'` should be replaced with `how='full'`.
+(Deprecated in version 0.20.29)
+  metadata_df.join(stats_df, on="symbol", how="outer")
+Traceback (most recent call last):
+  File "/app/binance-perps-pro/process_data.py", line 666, in <module>
+    asyncio.run(build_panel(end_date=end_date, max_symbols=args.max_symbols))
+  File "/home/jules/.pyenv/versions/3.12.12/lib/python3.12/asyncio/runners.py", line 195, in run
+    return runner.run(main)
+           ^^^^^^^^^^^^^^^^
+  File "/home/jules/.pyenv/versions/3.12.12/lib/python3.12/asyncio/runners.py", line 118, in run
+    return self._loop.run_until_complete(task)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/jules/.pyenv/versions/3.12.12/lib/python3.12/asyncio/base_events.py", line 691, in run_until_complete
+    return future.result()
+           ^^^^^^^^^^^^^^^
+  File "/app/binance-perps-pro/process_data.py", line 629, in build_panel
+    .with_columns([
+     ^^^^^^^^^^^^^^
+  File "/app/binance-perps-pro/.venv/lib/python3.12/site-packages/polars/dataframe/frame.py", line 10473, in with_columns
+    .collect(optimizations=QueryOptFlags._eager())
+     ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/app/binance-perps-pro/.venv/lib/python3.12/site-packages/polars/_utils/deprecation.py", line 97, in wrapper
+    return function(*args, **kwargs)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/app/binance-perps-pro/.venv/lib/python3.12/site-packages/polars/lazyframe/opt_flags.py", line 326, in wrapper
+    return function(*args, **kwargs)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/app/binance-perps-pro/.venv/lib/python3.12/site-packages/polars/lazyframe/frame.py", line 2440, in collect
+    return wrap_df(ldf.collect(engine, callback))
+                   ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+polars.exceptions.ColumnNotFoundError: unable to find column "listing_time"; valid columns: ["symbol", "symbol_right", "first_trade_time", "last_trade_time", "first_funding_time"]
