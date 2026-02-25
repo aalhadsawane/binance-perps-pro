@@ -42,7 +42,11 @@ logger = logging.getLogger(__name__)
 
 # ==================== CONFIG ====================
 BASE_URL = "https://data.binance.vision/"   # clean & correct
-API_URL = "https://fapi.binance.com/fapi/v1/exchangeInfo"
+# List of API endpoints to try (Primary -> Failover)
+API_ENDPOINTS = [
+    "https://fapi.binance.com/fapi/v1/exchangeInfo",
+    "https://testnet.binancefuture.com/fapi/v1/exchangeInfo"
+]
 DATA_DIR = Path("raw_data")
 CACHE_DIR = Path("cache")
 # Filename includes present date for versioning
@@ -359,18 +363,28 @@ def parse_oi_zip(path: Path) -> pl.DataFrame:
 
 # ==================== SYMBOL METADATA ====================
 async def fetch_exchange_info():
-    """Fetches symbol metadata from Binance Futures API."""
-    async with ClientSession() as session:
-        try:
-            async with session.get(API_URL, timeout=10) as resp:
-                if resp.status == 200:
-                    return await resp.json()
-                else:
-                    logger.warning(f"Failed to fetch exchange info: {resp.status}")
-                    return None
-        except Exception as e:
-            logger.warning(f"Error fetching exchange info: {e}")
-            return None
+    """Fetches symbol metadata from Binance Futures API with fallback."""
+    headers = {
+        "User-Agent": "Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/120.0.0.0 Safari/537.36"
+    }
+    async with ClientSession(headers=headers) as session:
+        for url in API_ENDPOINTS:
+            try:
+                logger.info(f"Fetching metadata from: {url}")
+                async with session.get(url, timeout=10) as resp:
+                    if resp.status == 200:
+                        data = await resp.json()
+                        logger.info("✅ Exchange Info fetched successfully.")
+                        return data
+                    elif resp.status == 451:
+                        logger.warning(f"⚠️ Geo-blocked (451) at {url}. You may be in a restricted region (e.g. US).")
+                    else:
+                        logger.warning(f"Failed to fetch exchange info from {url}: HTTP {resp.status}")
+            except Exception as e:
+                logger.warning(f"Error fetching from {url}: {e}")
+
+    logger.error("❌ Could not fetch exchange metadata from any source. Metadata columns will be null.")
+    return None
 
 def extract_symbol_metadata(info: dict, symbols: list) -> pl.DataFrame:
     """Parses exchange info into a Polars DataFrame."""

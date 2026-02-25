@@ -64,6 +64,12 @@ A separate file `data/symbol_information.parquet` contains static and statistica
 
 Use `loader.load_metadata()` to access this file.
 
+### Troubleshooting: Missing Metadata (Nulls)
+The `symbol_information.parquet` file relies on the Binance Futures API to populate contract specifications (tick size, leverage, etc.).
+- **Issue:** If you see `null` in fields like `tick_size` or `status`, it is likely because the script is running in a **Restricted Jurisdiction (e.g., USA)** where `fapi.binance.com` is blocked (HTTP 451).
+- **Fallback:** The script attempts to use the **Testnet** API (`testnet.binancefuture.com`) as a fallback. However, testnet symbols may not match mainnet symbols (e.g., BTCUSDT might not be listed or have different specs).
+- **Solution:** To get complete metadata, run the `process_data.py` script from a non-restricted IP address (VPN or VPS) or provide a custom proxy if you are technically inclined. The core OHLCV data (from `data.binance.vision`) is **NOT** geo-blocked and will work regardless.
+
 ## Quick Start
 
 ### 1. Install Dependencies
