@@ -1,0 +1,28 @@
+{
+  "BUILD_VERSION": "v1.8",
+  "SNAPSHOT_DATE_TIME": "2026-02-26T12:40:55.078893+00:00",
+  "DATA_RANGE": "2022-01-01 \u2192 2022-01-05",
+  "cutoff": "2022-01-05",
+  "symbols": 1,
+  "universe_hash": "4de5228122a41996",
+  "rows": 119,
+  "size_mb": 0.0,
+  "fields": [
+    "timestamp",
+    "open",
+    "high",
+    "low",
+    "close",
+    "volume",
+    "funding_rate",
+    "mark_price",
+    "open_interest",
+    "symbol",
+    "is_active",
+    "dollar_volume",
+    "next_funding_rate",
+    "ret_1h",
+    "fwd_ret_1h"
+  ],
+  "loader_version": "1.0.0"
+}

@@ -69,11 +69,12 @@ The `symbol_information.parquet` file relies on the Binance Futures API to popul
 - **Issue:** If you see `null` in fields like `tick_size` or `status`, it is likely because the script is running in a **Restricted Jurisdiction (e.g., USA)** where `fapi.binance.com` is blocked (HTTP 451).
 - **Solution:** To get complete metadata, **you must run the `process_data.py` script from a non-restricted IP address** (outside the US). The core OHLCV data (from `data.binance.vision`) is NOT geo-blocked and will work regardless, but the metadata file will be incomplete without API access.
 
-### Manual Delistings
-Since the API may not accurately reflect the "Delisting Time" for already removed symbols, you can provide a manual override file:
-1. Create `delistings.csv` in the project root.
-2. Format: `symbol,delisting_time` (e.g., `LUNAUSDT,2022-05-13T00:00:00`).
-3. Run `process_data.py`. The script will merge this data into the `delivery_time` column of `symbol_information.parquet`.
+### Delisted Symbols
+The metadata logic automatically handles symbols that are no longer listed on the exchange (and thus absent from the live API):
+- **Status:** Automatically marked as `DELISTED`.
+- **Delivery Time:** Set to the timestamp of the last trade in the dataset (`last_trade_time`).
+- **Base Asset:** Inferred from the symbol name (e.g., `LUNAUSDT` -> `LUNA`).
+- **Active Symbols:** For currently trading symbols, `delivery_time` matches the API's `deliveryDate` (typically set to a far-future date like 2100).
 
 ## Quick Start
 
