@@ -1,12 +1,12 @@
 {
   "BUILD_VERSION": "v1.7",
-  "SNAPSHOT_DATE_TIME": "2026-02-24T12:18:10.253994+00:00",
-  "DATA_RANGE": "2022-01-01 \u2192 2022-01-02",
-  "cutoff": "2022-01-02",
+  "SNAPSHOT_DATE_TIME": "2026-02-24T18:08:08.241528+00:00",
+  "DATA_RANGE": "2022-01-01 \u2192 2026-02-23",
+  "cutoff": "2026-02-23",
   "symbols": 1,
   "universe_hash": "19aa16aed07f38e9",
-  "rows": 119,
-  "size_mb": 0.0,
+  "rows": 37080,
+  "size_mb": 2.0,
   "fields": [
     "timestamp",
     "open",
