@@ -115,7 +115,7 @@ async def download_file(session: ClientSession, url: str, save_path: Path, retri
     async with DOWNLOAD_SEMAPHORE:
         for attempt in range(retries):
             try:
-                async with session.get(url, timeout=120) as resp:
+                async with session.get(url, timeout=aiohttp.ClientTimeout(total=120)) as resp:
                     if resp.status == 200:
                         save_path.parent.mkdir(parents=True, exist_ok=True)
                         with open(save_path, "wb") as f:
