@@ -4,7 +4,7 @@ import logging
 
 logger = logging.getLogger(__name__)
 
-def build_symbol_metadata(panel_df: pl.DataFrame, exchange_info: dict) -> pl.DataFrame:
+def build_symbol_metadata(panel_df: pl.DataFrame, exchange_info: dict | None) -> pl.DataFrame:
     """
     Constructs the symbol metadata DataFrame by combining:
     1. Empirical stats from the Panel (first/last trade times).
@@ -123,23 +123,26 @@ def build_symbol_metadata(panel_df: pl.DataFrame, exchange_info: dict) -> pl.Dat
         rows.append(row)
 
     # 4. Create DataFrame
-    schema = {
-        "symbol": pl.Utf8,
-        "base_asset": pl.Utf8,
-        "quote_asset": pl.Utf8,
-        "margin_asset": pl.Utf8,
-        "contract_type": pl.Utf8,
-        "listing_time": pl.Datetime("ms"),
-        "delivery_time": pl.Datetime("ms"),
-        "status": pl.Utf8,
-        "tick_size": pl.Float64,
-        "lot_size": pl.Float64,
-        "min_qty": pl.Float64,
-        "min_notional": pl.Float64,
-        "max_leverage": pl.Float64,
-        "first_trade_time": pl.Datetime("ms"),
-        "last_trade_time": pl.Datetime("ms"),
-        "first_funding_time": pl.Datetime("ms")
-    }
+    # Note: Polars schema expects mapping of str to DataType, verified correct.
+    # Mypy might complain about dict[str, object] not matching strict TypedDict or similar,
+    # but dict[str, pl.DataType] is valid for pl.DataFrame(..., schema=...).
+    # We cast explicit types here.
 
-    return pl.DataFrame(rows, schema=schema)
+    return pl.DataFrame(rows).with_columns([
+        pl.col("symbol").cast(pl.Utf8),
+        pl.col("base_asset").cast(pl.Utf8),
+        pl.col("quote_asset").cast(pl.Utf8),
+        pl.col("margin_asset").cast(pl.Utf8),
+        pl.col("contract_type").cast(pl.Utf8),
+        pl.col("listing_time").cast(pl.Datetime("ms")),
+        pl.col("delivery_time").cast(pl.Datetime("ms")),
+        pl.col("status").cast(pl.Utf8),
+        pl.col("tick_size").cast(pl.Float64),
+        pl.col("lot_size").cast(pl.Float64),
+        pl.col("min_qty").cast(pl.Float64),
+        pl.col("min_notional").cast(pl.Float64),
+        pl.col("max_leverage").cast(pl.Float64),
+        pl.col("first_trade_time").cast(pl.Datetime("ms")),
+        pl.col("last_trade_time").cast(pl.Datetime("ms")),
+        pl.col("first_funding_time").cast(pl.Datetime("ms"))
+    ])
