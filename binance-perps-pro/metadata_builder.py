@@ -33,16 +33,22 @@ def build_symbol_metadata(panel_df: pl.DataFrame, exchange_info: dict | None) ->
         .collect()
     )
 
-    # Calculate first funding time separately or via join
-    funding_stats = (
-        panel_df.lazy()
-        .filter(pl.col("funding_rate").is_not_null())
-        .group_by("symbol")
-        .agg(pl.col("timestamp").min().alias("first_funding_time"))
-        .collect()
-    )
-
-    stats = stats.join(funding_stats, on="symbol", how="left")
+    # If there are no active rows, return an empty dataframe with correct schema
+    if "symbol" not in stats.columns:
+        unique_symbols = []
+    else:
+        # Calculate first funding time separately or via join
+        funding_stats = (
+            panel_df.lazy()
+            .filter(pl.col("funding_rate").is_not_null())
+            .group_by("symbol")
+            .agg(pl.col("timestamp").min().alias("first_funding_time"))
+            .collect()
+        )
+        if "symbol" in funding_stats.columns:
+            stats = stats.join(funding_stats, on="symbol", how="left")
+        else:
+            stats = stats.with_columns(pl.lit(None).cast(pl.Datetime("ms")).alias("first_funding_time"))
 
     # 2. Process API Data
     api_map = {}
@@ -85,7 +91,10 @@ def build_symbol_metadata(panel_df: pl.DataFrame, exchange_info: dict | None) ->
 
     # Iterate through all symbols found in the PANEL (our universe)
     # This ensures we cover delisted coins that are in our data but not in API.
-    unique_symbols = stats["symbol"].to_list()
+    if "symbol" in stats.columns:
+        unique_symbols = stats["symbol"].to_list()
+    else:
+        unique_symbols = []
 
     for sym in unique_symbols:
         emp_data = stats.filter(pl.col("symbol") == sym).to_dicts()[0]
@@ -127,6 +136,28 @@ def build_symbol_metadata(panel_df: pl.DataFrame, exchange_info: dict | None) ->
     # Mypy might complain about dict[str, object] not matching strict TypedDict or similar,
     # but dict[str, pl.DataType] is valid for pl.DataFrame(..., schema=...).
     # We cast explicit types here.
+
+    schema = {
+        "symbol": pl.Utf8,
+        "base_asset": pl.Utf8,
+        "quote_asset": pl.Utf8,
+        "margin_asset": pl.Utf8,
+        "contract_type": pl.Utf8,
+        "listing_time": pl.Datetime("ms"),
+        "delivery_time": pl.Datetime("ms"),
+        "status": pl.Utf8,
+        "tick_size": pl.Float64,
+        "lot_size": pl.Float64,
+        "min_qty": pl.Float64,
+        "min_notional": pl.Float64,
+        "max_leverage": pl.Float64,
+        "first_trade_time": pl.Datetime("ms"),
+        "last_trade_time": pl.Datetime("ms"),
+        "first_funding_time": pl.Datetime("ms")
+    }
+
+    if not rows:
+        return pl.DataFrame(schema=schema)
 
     return pl.DataFrame(rows).with_columns([
         pl.col("symbol").cast(pl.Utf8),
