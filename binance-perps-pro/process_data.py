@@ -138,10 +138,14 @@ async def download_file(session: ClientSession, url: str, save_path: Path, retri
 
 
 async def download_all_for_symbol(
-    session: ClientSession, symbol: str, data_type: str, interval: str = None, end_date: date = None
+    session: ClientSession, symbol: str, data_type: str, interval: str | None = None, end_date: date | None = None
 ):
     files_downloaded = 0
     current = START_DATE
+
+    # Check inputs (handled by main usually, but for mypy safety)
+    if end_date is None:
+        return symbol, data_type, 0
 
     # Pre-calculate month logic
     while current <= end_date:
@@ -193,7 +197,7 @@ async def download_all_for_symbol(
         # Try monthly download first (if URL exists)
         should_try_monthly = (url_monthly is not None) and ((current.day == 1) or (current == START_DATE))
 
-        if should_try_monthly:
+        if should_try_monthly and url_monthly and path_monthly:
             if await download_file(session, url_monthly, path_monthly):
                 files_downloaded += 1
                 # If successful, skip to next month
@@ -369,7 +373,7 @@ async def fetch_exchange_info():
     async with ClientSession(headers=headers) as session:
         try:
             logger.info(f"Fetching metadata from: {API_URL}")
-            async with session.get(API_URL, timeout=10) as resp:
+            async with session.get(API_URL, timeout=aiohttp.ClientTimeout(total=10)) as resp:
                 if resp.status == 200:
                     data = await resp.json()
                     logger.info("✅ Exchange Info fetched successfully.")
@@ -387,7 +391,7 @@ async def fetch_exchange_info():
 # Metadata extraction logic moved to metadata_builder.py
 
 # ==================== MAIN PIPELINE ====================
-async def build_panel(end_date: date = None, max_symbols: int = 80):
+async def build_panel(end_date: date | None = None, max_symbols: int = 80):
     END_DATE = end_date or (date.today() - timedelta(days=1))
     CACHE_DIR.mkdir(parents=True, exist_ok=True)
     DATA_DIR.mkdir(parents=True, exist_ok=True)
