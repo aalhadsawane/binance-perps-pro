@@ -198,15 +198,20 @@ async def download_all_for_symbol(
         should_try_monthly = (url_monthly is not None) and ((current.day == 1) or (current == START_DATE))
 
         if should_try_monthly and url_monthly and path_monthly:
-            if await download_file(session, url_monthly, path_monthly):
-                files_downloaded += 1
-                # If successful, skip to next month
-                current = next_month_start
-                logger.info(f"✅ Downloaded monthly {data_type} for {symbol} {month_str}")
+            # Retry monthly download up to 2 times
+            monthly_success = False
+            for _ in range(2):
+                if await download_file(session, url_monthly, path_monthly):
+                    files_downloaded += 1
+                    # If successful, skip to next month
+                    current = next_month_start
+                    logger.info(f"✅ Downloaded monthly {data_type} for {symbol} {month_str}")
+                    monthly_success = True
+                    break
+
+            if monthly_success:
                 continue
-            else:
-                # If failed, we fall back to daily.
-                pass
+            # If failed, we fall back to daily.
 
         # === Daily Fallback ===
         if data_type == "klines":
@@ -226,6 +231,8 @@ async def download_all_for_symbol(
             fname_daily = f"{symbol}-metrics-{current.strftime('%Y-%m-%d')}.zip"
             url_daily = f"{BASE_URL}data/futures/um/daily/metrics/{symbol}/{fname_daily}"
             path_daily = DATA_DIR / "openInterest" / symbol / fname_daily
+        else:
+             raise ValueError(f"Unknown data_type: {data_type}")
 
         if await download_file(session, url_daily, path_daily):
             files_downloaded += 1
@@ -236,63 +243,84 @@ async def download_all_for_symbol(
 
 
 # ==================== PARSERS ====================
+PARSING_ERRORS = []
+
 def parse_klines_zip(path: Path) -> pl.DataFrame:
-    with zipfile.ZipFile(path) as z:
-        csv_name = z.namelist()[0]
-        with z.open(csv_name) as f:
-            # Binance Klines CSVs do NOT have headers
-            df = pl.read_csv(
-                f,
-                has_header=False,
-                new_columns=[
-                    "open_time", "open", "high", "low", "close", "volume",
-                    "close_time", "quote_volume", "count",
-                    "taker_buy_volume", "taker_buy_quote_volume", "ignore"
-                ],
-                schema_overrides={
-                    "open_time": pl.Int64,
-                    "open": pl.Float64,
-                    "high": pl.Float64,
-                    "low": pl.Float64,
-                    "close": pl.Float64,
-                    "volume": pl.Float64,
-                },
-                infer_schema_length=0,
-                ignore_errors=True,
+    try:
+        with zipfile.ZipFile(path) as z:
+            csv_name = z.namelist()[0]
+            with z.open(csv_name) as f:
+                # Binance Klines CSVs do NOT have headers
+                df = pl.read_csv(
+                    f,
+                    has_header=False,
+                    new_columns=[
+                        "open_time", "open", "high", "low", "close", "volume",
+                        "close_time", "quote_volume", "count",
+                        "taker_buy_volume", "taker_buy_quote_volume", "ignore"
+                    ],
+                    schema_overrides={
+                        "open_time": pl.Int64,
+                        "open": pl.Float64,
+                        "high": pl.Float64,
+                        "low": pl.Float64,
+                        "close": pl.Float64,
+                        "volume": pl.Float64,
+                    },
+                    infer_schema_length=0,
+                    ignore_errors=True,
+                )
+        return (
+            df.with_columns([
+                pl.col("open_time").cast(pl.Datetime("ms")).dt.truncate("1h").alias("timestamp"),
+                pl.col(["open", "high", "low", "close", "volume"]).cast(pl.Float64),
+            ])
+            .with_columns(
+                pl.when(
+                    (pl.col("high") < pl.max_horizontal("open", "low", "close")) |
+                    (pl.col("low") > pl.min_horizontal("open", "high", "close")) |
+                    (pl.col("high") < pl.col("low")) |
+                    (pl.col("volume") < 0)
+                )
+                .then(pl.lit("ohlc_violation"))
+                .otherwise(pl.lit("ok"))
+                .alias("data_quality")
             )
-    return (
-        df.with_columns([
-            pl.col("open_time").cast(pl.Datetime("ms")).dt.truncate("1h").alias("timestamp"),
-            pl.col(["open", "high", "low", "close", "volume"]).cast(pl.Float64),
-        ])
-        .with_columns([
-            pl.max_horizontal("open", "high", "low", "close").alias("high"),
-            pl.min_horizontal("open", "high", "low", "close").alias("low"),
-        ])
-        .select(["timestamp", "open", "high", "low", "close", "volume"])
-        .unique("timestamp")
-    )
+            .select(["timestamp", "open", "high", "low", "close", "volume", "data_quality"])
+            .unique("timestamp")
+        )
+    except Exception as e:
+        logger.warning(f"Error parsing kline zip {path}: {e}")
+        print(f"Error parsing kline zip {path}: {e}")
+        PARSING_ERRORS.append(f"{path}: {e}")
+        return pl.DataFrame(schema={"timestamp": pl.Datetime("ms"), "open": pl.Float64, "high": pl.Float64, "low": pl.Float64, "close": pl.Float64, "volume": pl.Float64, "data_quality": pl.Utf8})
 
 def parse_funding_zip(path: Path) -> pl.DataFrame:
-    with zipfile.ZipFile(path) as z:
-        csv_name = z.namelist()[0]
-        with z.open(csv_name) as f:
-            df = pl.read_csv(
-                f,
-                has_header=True,
-                schema_overrides={
-                    "calc_time": pl.Int64,
-                    "last_funding_rate": pl.Float64
-                }
-            )
+    try:
+        with zipfile.ZipFile(path) as z:
+            csv_name = z.namelist()[0]
+            with z.open(csv_name) as f:
+                df = pl.read_csv(
+                    f,
+                    has_header=True,
+                    schema_overrides={
+                        "calc_time": pl.Int64,
+                        "last_funding_rate": pl.Float64
+                    }
+                )
 
-    return (
-        df.with_columns([
-            pl.col("calc_time").cast(pl.Datetime("ms")).dt.truncate("1h").alias("timestamp"),
-            pl.col("last_funding_rate").alias("funding_rate"),
-        ])
-        .select(["timestamp", "funding_rate"])
-    )
+        return (
+            df.with_columns([
+                pl.col("calc_time").cast(pl.Datetime("ms")).dt.truncate("1h").alias("timestamp"),
+                pl.col("last_funding_rate").alias("funding_rate"),
+            ])
+            .select(["timestamp", "funding_rate"])
+        )
+    except Exception as e:
+        logger.warning(f"Error parsing funding zip {path}: {e}")
+        print(f"Error parsing funding zip {path}: {e}")
+        PARSING_ERRORS.append(f"{path}: {e}")
+        return pl.DataFrame(schema={"timestamp": pl.Datetime("ms"), "funding_rate": pl.Float64})
 
 
 def parse_mark_price_zip(path: Path) -> pl.DataFrame:
@@ -301,33 +329,39 @@ def parse_mark_price_zip(path: Path) -> pl.DataFrame:
     Format: standard kline, no header.
     Columns: open_time, open, high, low, close(mark_price), ...
     """
-    with zipfile.ZipFile(path) as z:
-        csv_name = z.namelist()[0]
-        with z.open(csv_name) as f:
-            df = pl.read_csv(
-                f,
-                has_header=False,
-                new_columns=[
-                    "open_time", "open", "high", "low", "close", "volume",
-                    "close_time", "quote_volume", "count",
-                    "taker_buy_volume", "taker_buy_quote_volume", "ignore"
-                ],
-                schema_overrides={
-                    "open_time": pl.Int64,
-                    "close": pl.Float64,
-                },
-                infer_schema_length=0,
-                ignore_errors=True
-            )
-    return (
-        df.with_columns([
-            pl.col("open_time").cast(pl.Datetime("ms")).dt.truncate("1h").alias("timestamp"),
-            pl.col("close").alias("mark_price"),
-        ])
-        .select(["timestamp", "mark_price"])
-        .group_by("timestamp")
-        .agg(pl.col("mark_price").last())
-    )
+    try:
+        with zipfile.ZipFile(path) as z:
+            csv_name = z.namelist()[0]
+            with z.open(csv_name) as f:
+                df = pl.read_csv(
+                    f,
+                    has_header=False,
+                    new_columns=[
+                        "open_time", "open", "high", "low", "close", "volume",
+                        "close_time", "quote_volume", "count",
+                        "taker_buy_volume", "taker_buy_quote_volume", "ignore"
+                    ],
+                    schema_overrides={
+                        "open_time": pl.Int64,
+                        "close": pl.Float64,
+                    },
+                    infer_schema_length=0,
+                    ignore_errors=True
+                )
+        return (
+            df.with_columns([
+                pl.col("open_time").cast(pl.Datetime("ms")).dt.truncate("1h").alias("timestamp"),
+                pl.col("close").alias("mark_price"),
+            ])
+            .select(["timestamp", "mark_price"])
+            .group_by("timestamp")
+            .agg(pl.col("mark_price").last())
+        )
+    except Exception as e:
+        logger.warning(f"Error parsing mark price zip {path}: {e}")
+        print(f"Error parsing mark price zip {path}: {e}")
+        PARSING_ERRORS.append(f"{path}: {e}")
+        return pl.DataFrame(schema={"timestamp": pl.Datetime("ms"), "mark_price": pl.Float64})
 
 
 def parse_oi_zip(path: Path) -> pl.DataFrame:
@@ -337,32 +371,38 @@ def parse_oi_zip(path: Path) -> pl.DataFrame:
     Columns: create_time, symbol, sum_open_interest, sum_open_interest_value, ...
     create_time is string "YYYY-MM-DD HH:MM:SS"
     """
-    with zipfile.ZipFile(path) as z:
-        csv_name = z.namelist()[0]
-        with z.open(csv_name) as f:
-            df = pl.read_csv(
-                f,
-                has_header=True,
-                schema_overrides={
-                    "create_time": pl.String,
-                    "sum_open_interest_value": pl.Float64
-                }
-            )
+    try:
+        with zipfile.ZipFile(path) as z:
+            csv_name = z.namelist()[0]
+            with z.open(csv_name) as f:
+                df = pl.read_csv(
+                    f,
+                    has_header=True,
+                    schema_overrides={
+                        "create_time": pl.String,
+                        "sum_open_interest_value": pl.Float64
+                    }
+                )
 
-    # If "create_time" missing, try to detect? No, assuming standard metrics format.
-    if "create_time" not in df.columns:
+        # If "create_time" missing, try to detect? No, assuming standard metrics format.
+        if "create_time" not in df.columns:
+            return pl.DataFrame(schema={"timestamp": pl.Datetime("ms"), "open_interest": pl.Float64})
+
+        return (
+            df.with_columns([
+                # Parse string datetime "2022-01-01 00:00:00" -> Datetime
+                pl.col("create_time").str.strptime(pl.Datetime("ms"), format="%Y-%m-%d %H:%M:%S").dt.truncate("1h").alias("timestamp"),
+                pl.col("sum_open_interest_value").alias("open_interest"),
+            ])
+            .select(["timestamp", "open_interest"])
+            .group_by("timestamp")
+            .agg(pl.col("open_interest").last())
+        )
+    except Exception as e:
+        logger.warning(f"Error parsing oi zip {path}: {e}")
+        print(f"Error parsing oi zip {path}: {e}")
+        PARSING_ERRORS.append(f"{path}: {e}")
         return pl.DataFrame(schema={"timestamp": pl.Datetime("ms"), "open_interest": pl.Float64})
-
-    return (
-        df.with_columns([
-            # Parse string datetime "2022-01-01 00:00:00" -> Datetime
-            pl.col("create_time").str.strptime(pl.Datetime("ms"), format="%Y-%m-%d %H:%M:%S").dt.truncate("1h").alias("timestamp"),
-            pl.col("sum_open_interest_value").alias("open_interest"),
-        ])
-        .select(["timestamp", "open_interest"])
-        .group_by("timestamp")
-        .agg(pl.col("open_interest").last())
-    )
 
 # ==================== SYMBOL METADATA ====================
 async def fetch_exchange_info():
@@ -422,8 +462,8 @@ async def build_panel(end_date: date | None = None, max_symbols: int = 80):
 
     logger.info("✅ Downloads complete. Building panel...")
 
-    start_ts = pl.datetime(2022, 1, 1, time_unit="ms")
-    end_ts = pl.datetime(END_DATE.year, END_DATE.month, END_DATE.day, time_unit="ms") + pl.duration(hours=23)
+    start_ts = datetime(2022, 1, 1)
+    end_ts = datetime(END_DATE.year, END_DATE.month, END_DATE.day, 23, 0, 0)
     
     full_grid = pl.select(
         pl.datetime_range(start_ts, end_ts, "1h", closed="left", time_unit="ms").alias("timestamp")
@@ -485,6 +525,7 @@ async def build_panel(end_date: date | None = None, max_symbols: int = 80):
             .with_columns([
                 pl.col("mark_price").forward_fill().alias("mark_price"),
                 pl.col("open_interest").forward_fill().alias("open_interest"),
+                pl.col("funding_rate").forward_fill().alias("funding_rate"),
                 pl.lit(sym).cast(pl.Categorical).alias("symbol"),
                 pl.when(pl.col("volume").is_not_null() & (pl.col("volume") > 0))
                   .then(pl.col("timestamp"))
@@ -541,6 +582,7 @@ async def build_panel(end_date: date | None = None, max_symbols: int = 80):
                 "open_interest", "dollar_volume", "ret_1h", "fwd_ret_1h", "next_funding_rate"]).cast(pl.Float64),
         pl.col("is_active").cast(pl.Boolean),
         pl.col("timestamp").cast(pl.Datetime("ms", "UTC")),
+        pl.col("data_quality").cast(pl.Categorical),
     ])
 
     OUTPUT_PARQUET.parent.mkdir(parents=True, exist_ok=True)
@@ -561,7 +603,7 @@ async def build_panel(end_date: date | None = None, max_symbols: int = 80):
         logger.error(f"❌ Failed to build symbol metadata: {e}")
 
     meta = {
-        "BUILD_VERSION": "v1.8",
+        "BUILD_VERSION": CODE_VERSION,
         "SNAPSHOT_DATE_TIME": datetime.now(timezone.utc).isoformat(),
         "DATA_RANGE": f"2022-01-01 → {END_DATE.isoformat()}",
         "cutoff": END_DATE.isoformat(),
@@ -576,6 +618,11 @@ async def build_panel(end_date: date | None = None, max_symbols: int = 80):
         json.dump(meta, f, indent=2)
 
     logger.info(f"✅ SUCCESS! Parquet: {OUTPUT_PARQUET} ({meta['size_mb']} MB)")
+
+    if PARSING_ERRORS:
+        print("\n⚠️  Parsing Errors Encountered:")
+        for err in PARSING_ERRORS:
+            print(f"  - {err}")
 
 
 if __name__ == "__main__":
