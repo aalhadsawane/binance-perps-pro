@@ -1,6 +1,9 @@
 import polars as pl
 from datetime import datetime, timezone
 import logging
+import asyncio
+import aiohttp
+from pathlib import Path
 
 logger = logging.getLogger(__name__)
 
@@ -177,3 +180,65 @@ def build_symbol_metadata(panel_df: pl.DataFrame, exchange_info: dict | None) ->
         pl.col("last_trade_time").cast(pl.Datetime("ms")),
         pl.col("first_funding_time").cast(pl.Datetime("ms"))
     ])
+
+async def fetch_exchange_info():
+    """Fetches symbol metadata from Binance Futures API."""
+    API_URL = "https://fapi.binance.com/fapi/v1/exchangeInfo"
+    headers = {
+        "User-Agent": "Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/120.0.0.0 Safari/537.36"
+    }
+    async with aiohttp.ClientSession(headers=headers) as session:
+        try:
+            logger.info(f"Fetching metadata from: {API_URL}")
+            async with session.get(API_URL, timeout=aiohttp.ClientTimeout(total=10)) as resp:
+                if resp.status == 200:
+                    data = await resp.json()
+                    logger.info("✅ Exchange Info fetched successfully.")
+                    return data
+                elif resp.status == 451:
+                    logger.warning(f"⚠️ Geo-blocked (451) at {API_URL}. You may be in a restricted region (e.g. US). Metadata will be null.")
+                    return None
+                else:
+                    logger.warning(f"Failed to fetch exchange info: {resp.status}")
+                    return None
+        except Exception as e:
+            logger.warning(f"Error fetching exchange info: {e}")
+            return None
+
+async def main():
+    logging.basicConfig(level=logging.INFO, format="%(asctime)s | %(levelname)s | %(message)s")
+
+    # Try to load the latest panel
+    data_dir = Path(__file__).parent / "data"
+    files = sorted(data_dir.glob("binance_perps_panel_*.parquet"))
+
+    if not files:
+        logger.error(f"No panel parquet file found in {data_dir}. Cannot build metadata.")
+        return
+
+    latest_panel = files[-1]
+    logger.info(f"Loading main panel from {latest_panel}...")
+
+    # Load the panel dataframe
+    try:
+        panel_df = pl.read_parquet(latest_panel)
+    except Exception as e:
+        logger.error(f"Failed to read parquet file: {e}")
+        return
+
+    # Fetch exchange info
+    exchange_info = await fetch_exchange_info()
+
+    # Build metadata
+    logger.info("Building symbol metadata...")
+    try:
+        metadata_df = build_symbol_metadata(panel_df, exchange_info)
+
+        output_path = data_dir / "symbol_information.parquet"
+        metadata_df.write_parquet(output_path)
+        logger.info(f"✅ Successfully wrote symbol metadata to {output_path}")
+    except Exception as e:
+        logger.error(f"❌ Failed to build symbol metadata: {e}")
+
+if __name__ == "__main__":
+    asyncio.run(main())
