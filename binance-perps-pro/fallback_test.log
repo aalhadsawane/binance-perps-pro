@@ -1,15 +1,0 @@
-2026-02-25 13:54:45,959 | INFO | Building panel with 1 symbols (max=1)
-2026-02-25 13:54:45,959 | INFO | Fetching Exchange Info...
-2026-02-25 13:54:45,960 | INFO | Fetching metadata from: https://fapi.binance.com/fapi/v1/exchangeInfo
-2026-02-25 13:54:46,436 | WARNING | ⚠️ Geo-blocked (451) at https://fapi.binance.com/fapi/v1/exchangeInfo. You may be in a restricted region (e.g. US).
-2026-02-25 13:54:46,436 | INFO | Fetching metadata from: https://testnet.binancefuture.com/fapi/v1/exchangeInfo
-2026-02-25 13:54:46,815 | INFO | ✅ Exchange Info fetched successfully.
-Downloading raw files:   0%|          | 0/4 [00:00<?, ?it/s]2026-02-25 13:54:46,839 | INFO | ✅ Downloaded monthly klines for 1INCHUSDT 2022-01
-2026-02-25 13:54:46,840 | INFO | ✅ Downloaded monthly fundingRate for 1INCHUSDT 2022-01
-2026-02-25 13:54:46,840 | INFO | ✅ Downloaded monthly markPrice for 1INCHUSDT 2022-01
-Downloading raw files: 100%|██████████| 4/4 [00:00<00:00, 2540.46it/s]
-2026-02-25 13:54:46,841 | INFO | ✅ Downloads complete. Building panel...
-Processing symbols:   0%|          | 0/1 [00:00<?, ?it/s]2026-02-25 13:54:46,897 | INFO | Loaded cache for 1INCHUSDT
-Processing symbols: 100%|██████████| 1/1 [00:00<00:00, 28.17it/s]
-2026-02-25 13:54:46,934 | INFO | ✅ Symbol Information saved: data/symbol_information.parquet
-2026-02-25 13:54:46,935 | INFO | ✅ SUCCESS! Parquet: data/binance_perps_panel_2022_2026_20260225.parquet (0.0 MB)

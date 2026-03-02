@@ -1,0 +1,29 @@
+{
+  "BUILD_VERSION": "1.9",
+  "SNAPSHOT_DATE_TIME": "2026-03-02T14:47:17.584407+00:00",
+  "DATA_RANGE": "2022-01-01 \u2192 2022-01-05",
+  "cutoff": "2022-01-05",
+  "symbols": 2,
+  "universe_hash": "8bd2e9735fc87779",
+  "rows": 238,
+  "size_mb": 0.0,
+  "fields": [
+    "timestamp",
+    "open",
+    "high",
+    "low",
+    "close",
+    "volume",
+    "data_quality",
+    "funding_rate",
+    "mark_price",
+    "open_interest",
+    "symbol",
+    "is_active",
+    "dollar_volume",
+    "next_funding_rate",
+    "ret_1h",
+    "fwd_ret_1h"
+  ],
+  "loader_version": "1.0.0"
+}

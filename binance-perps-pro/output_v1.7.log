@@ -1,14 +1,0 @@
-2026-02-24 01:50:24,512 | WARNING | Cache version mismatch (Current: 1.7). Invalidating old cache...
-/app/binance-perps-pro/process_data.py:78: DeprecationWarning: datetime.datetime.utcnow() is deprecated and scheduled for removal in a future version. Use timezone-aware objects to represent datetimes in UTC: datetime.datetime.now(datetime.UTC).
-  json.dump({"version": CODE_VERSION, "updated": datetime.utcnow().isoformat()}, f)
-2026-02-24 01:50:24,514 | INFO | Building panel with 1 symbols (max=1)
-Downloading raw files:   0%|          | 0/4 [00:00<?, ?it/s]2026-02-24 01:50:25,018 | INFO | ✅ Downloaded monthly fundingRate for BTCUSDT 2022-01
-Downloading raw files:  25%|██▌       | 1/4 [00:00<00:01,  2.08it/s]2026-02-24 01:50:25,193 | INFO | ✅ Downloaded monthly klines for BTCUSDT 2022-01
-Downloading raw files:  50%|█████     | 2/4 [00:00<00:00,  3.33it/s]2026-02-24 01:50:25,195 | INFO | ✅ Downloaded monthly markPrice for BTCUSDT 2022-01
-Downloading raw files: 100%|██████████| 4/4 [00:02<00:00,  1.64it/s]Downloading raw files: 100%|██████████| 4/4 [00:02<00:00,  1.79it/s]
-2026-02-24 01:50:26,780 | INFO | ✅ Downloads complete. Building panel...
-Processing symbols:   0%|          | 0/1 [00:00<?, ?it/s]2026-02-24 01:50:26,968 | INFO | Cached BTCUSDT
-Processing symbols: 100%|██████████| 1/1 [00:00<00:00,  6.77it/s]Processing symbols: 100%|██████████| 1/1 [00:00<00:00,  6.75it/s]
-/app/binance-perps-pro/process_data.py:505: DeprecationWarning: datetime.datetime.utcnow() is deprecated and scheduled for removal in a future version. Use timezone-aware objects to represent datetimes in UTC: datetime.datetime.now(datetime.UTC).
-  "generated": datetime.utcnow().isoformat(),
-2026-02-24 01:50:26,991 | INFO | ✅ SUCCESS! Parquet: data/binance_perps_panel_2022_2026.parquet (0.0 MB)

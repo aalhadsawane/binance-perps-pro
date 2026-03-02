@@ -95,7 +95,7 @@ def build_symbol_metadata(panel_df: pl.DataFrame, exchange_info: dict | None) ->
     # Iterate through all symbols found in the PANEL (our universe)
     # This ensures we cover delisted coins that are in our data but not in API.
     if "symbol" in stats.columns:
-        unique_symbols = stats["symbol"].to_list()
+        unique_symbols = stats["symbol"].drop_nulls().to_list()
     else:
         unique_symbols = []
 

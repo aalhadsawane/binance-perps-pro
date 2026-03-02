@@ -1,37 +1,0 @@
-2026-02-23 16:28:19,681 | INFO | Building panel with 2 symbols (max=2)
-Downloading raw files:   0%|          | 0/8 [00:00<?, ?it/s]2026-02-23 16:28:19,688 | INFO | ✅ Downloaded monthly fundingRate for BTCUSDT 2022-01
-2026-02-23 16:28:19,688 | INFO | ✅ Downloaded monthly fundingRate for BTCUSDT 2022-02
-2026-02-23 16:28:19,690 | INFO | ✅ Downloaded monthly klines for ETHUSDT 2022-01
-2026-02-23 16:28:19,690 | INFO | ✅ Downloaded monthly klines for ETHUSDT 2022-02
-2026-02-23 16:28:19,690 | INFO | ✅ Downloaded monthly klines for BTCUSDT 2022-01
-2026-02-23 16:28:19,690 | INFO | ✅ Downloaded monthly klines for BTCUSDT 2022-02
-2026-02-23 16:28:19,691 | INFO | ✅ Downloaded monthly fundingRate for ETHUSDT 2022-01
-2026-02-23 16:28:19,691 | INFO | ✅ Downloaded monthly fundingRate for ETHUSDT 2022-02
-Downloading raw files:  62%|██████▎   | 5/8 [00:11<00:06,  2.27s/it]Downloading raw files:  75%|███████▌  | 6/8 [00:11<00:03,  1.82s/it]Downloading raw files: 100%|██████████| 8/8 [00:11<00:00,  1.15s/it]Downloading raw files: 100%|██████████| 8/8 [00:11<00:00,  1.48s/it]
-2026-02-23 16:28:31,492 | INFO | ✅ Downloads complete. Building panel...
-Processing symbols:   0%|          | 0/2 [00:00<?, ?it/s]2026-02-23 16:28:31,524 | INFO | Cached BTCUSDT
-Processing symbols:   0%|          | 0/2 [00:00<?, ?it/s]
-Traceback (most recent call last):
-  File "/app/binance-perps-pro/process_data.py", line 420, in <module>
-    asyncio.run(build_panel(end_date=end_date, max_symbols=args.max_symbols))
-  File "/home/jules/.pyenv/versions/3.12.12/lib/python3.12/asyncio/runners.py", line 195, in run
-    return runner.run(main)
-           ^^^^^^^^^^^^^^^^
-  File "/home/jules/.pyenv/versions/3.12.12/lib/python3.12/asyncio/runners.py", line 118, in run
-    return self._loop.run_until_complete(task)
-           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
-  File "/home/jules/.pyenv/versions/3.12.12/lib/python3.12/asyncio/base_events.py", line 691, in run_until_complete
-    return future.result()
-           ^^^^^^^^^^^^^^^
-  File "/app/binance-perps-pro/process_data.py", line 363, in build_panel
-    if not high_ok:
-           ^^^^^^^
-  File "/app/binance-perps-pro/.venv/lib/python3.12/site-packages/polars/expr/expr.py", line 332, in __bool__
-    raise TypeError(msg)
-TypeError: the truth value of an Expr is ambiguous
-
-You probably got here by using a Python standard library function instead of the native expressions API.
-Here are some things you might want to try:
-- instead of `pl.col('a') and pl.col('b')`, use `pl.col('a') & pl.col('b')`
-- instead of `pl.col('a') in [y, z]`, use `pl.col('a').is_in([y, z])`
-- instead of `max(pl.col('a'), pl.col('b'))`, use `pl.max_horizontal(pl.col('a'), pl.col('b'))`

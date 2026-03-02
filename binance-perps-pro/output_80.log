@@ -1,227 +1,0 @@
-/app/binance-perps-pro/process_data.py:76: DeprecationWarning: datetime.datetime.utcnow() is deprecated and scheduled for removal in a future version. Use timezone-aware objects to represent datetimes in UTC: datetime.datetime.now(datetime.UTC).
-  json.dump({"version": CODE_VERSION, "updated": datetime.utcnow().isoformat()}, f)
-2026-02-23 16:49:58,531 | INFO | Building panel with 80 symbols (max=80)
-Downloading raw files:   0%|          | 0/320 [00:00<?, ?it/s]2026-02-23 16:49:58,542 | INFO | ✅ Downloaded monthly fundingRate for BTCUSDT 2022-01
-2026-02-23 16:49:58,545 | INFO | ✅ Downloaded monthly klines for ETHUSDT 2022-01
-2026-02-23 16:49:58,547 | INFO | ✅ Downloaded monthly fundingRate for ETHUSDT 2022-01
-2026-02-23 16:49:58,597 | INFO | ✅ Downloaded monthly klines for BTCUSDT 2022-01
-2026-02-23 16:49:59,066 | INFO | ✅ Downloaded monthly fundingRate for XMRUSDT 2022-01
-Downloading raw files:   2%|▏         | 5/320 [00:00<00:33,  9.48it/s]2026-02-23 16:49:59,082 | INFO | ✅ Downloaded monthly fundingRate for ZECUSDT 2022-01
-2026-02-23 16:49:59,085 | INFO | ✅ Downloaded monthly fundingRate for BELUSDT 2022-01
-2026-02-23 16:49:59,100 | INFO | ✅ Downloaded monthly fundingRate for ARPAUSDT 2022-01
-2026-02-23 16:49:59,188 | INFO | ✅ Downloaded monthly klines for BELUSDT 2022-01
-Downloading raw files:   3%|▎         | 9/320 [00:00<00:20, 15.26it/s]2026-02-23 16:49:59,210 | INFO | ✅ Downloaded monthly klines for XMRUSDT 2022-01
-2026-02-23 16:49:59,242 | INFO | ✅ Downloaded monthly fundingRate for BNBUSDT 2022-01
-2026-02-23 16:49:59,508 | INFO | ✅ Downloaded monthly fundingRate for EOSUSDT 2022-01
-Downloading raw files:   4%|▍         | 12/320 [00:00<00:24, 12.42it/s]2026-02-23 16:49:59,602 | INFO | ✅ Downloaded monthly klines for BNBUSDT 2022-01
-2026-02-23 16:49:59,612 | INFO | ✅ Downloaded monthly klines for EOSUSDT 2022-01
-Downloading raw files:   4%|▍         | 14/320 [00:01<00:22, 13.68it/s]2026-02-23 16:49:59,813 | INFO | ✅ Downloaded monthly fundingRate for SOLUSDT 2022-01
-2026-02-23 16:49:59,826 | INFO | ✅ Downloaded monthly fundingRate for THETAUSDT 2022-01
-Downloading raw files:   5%|▌         | 16/320 [00:01<00:25, 12.15it/s]2026-02-23 16:49:59,922 | INFO | ✅ Downloaded monthly klines for SOLUSDT 2022-01
-2026-02-23 16:49:59,956 | INFO | ✅ Downloaded monthly klines for THETAUSDT 2022-01
-Downloading raw files:   6%|▌         | 18/320 [00:01<00:23, 12.90it/s]2026-02-23 16:50:00,026 | INFO | ✅ Downloaded monthly fundingRate for XRPUSDT 2022-01
-2026-02-23 16:50:00,031 | INFO | ✅ Downloaded monthly fundingRate for IOTAUSDT 2022-01
-2026-02-23 16:50:00,103 | INFO | ✅ Downloaded monthly klines for XRPUSDT 2022-01
-Downloading raw files:   7%|▋         | 21/320 [00:01<00:19, 14.96it/s]2026-02-23 16:50:00,113 | INFO | ✅ Downloaded monthly klines for IOTAUSDT 2022-01
-2026-02-23 16:50:00,126 | INFO | ✅ Downloaded monthly fundingRate for MKRUSDT 2022-01
-2026-02-23 16:50:00,142 | INFO | ✅ Downloaded monthly klines for MKRUSDT 2022-01
-2026-02-23 16:50:00,336 | INFO | ✅ Downloaded monthly fundingRate for DOGEUSDT 2022-01
-Downloading raw files:   8%|▊         | 25/320 [00:01<00:18, 15.82it/s]2026-02-23 16:50:00,458 | INFO | ✅ Downloaded monthly klines for DOGEUSDT 2022-01
-2026-02-23 16:50:00,531 | INFO | ✅ Downloaded monthly fundingRate for ADAUSDT 2022-01
-Downloading raw files:   8%|▊         | 27/320 [00:01<00:20, 14.06it/s]2026-02-23 16:50:00,615 | INFO | ✅ Downloaded monthly fundingRate for SNXUSDT 2022-01
-2026-02-23 16:50:00,655 | INFO | ✅ Downloaded monthly klines for SNXUSDT 2022-01
-Downloading raw files:   9%|▉         | 29/320 [00:02<00:20, 14.52it/s]2026-02-23 16:50:00,663 | INFO | ✅ Downloaded monthly klines for ADAUSDT 2022-01
-2026-02-23 16:50:00,692 | INFO | ✅ Downloaded monthly klines for COMPUSDT 2022-01
-2026-02-23 16:50:00,801 | INFO | ✅ Downloaded monthly fundingRate for TRXUSDT 2022-01
-Downloading raw files:  10%|█         | 32/320 [00:02<00:17, 16.10it/s]2026-02-23 16:50:00,854 | INFO | ✅ Downloaded monthly fundingRate for AVAXUSDT 2022-01
-2026-02-23 16:50:00,862 | INFO | ✅ Downloaded monthly fundingRate for COMPUSDT 2022-01
-2026-02-23 16:50:00,917 | INFO | ✅ Downloaded monthly klines for TRXUSDT 2022-01
-Downloading raw files:  11%|█         | 35/320 [00:02<00:15, 18.46it/s]2026-02-23 16:50:01,098 | INFO | ✅ Downloaded monthly fundingRate for CRVUSDT 2022-01
-2026-02-23 16:50:01,132 | INFO | ✅ Downloaded monthly klines for AVAXUSDT 2022-01
-Downloading raw files:  12%|█▏        | 37/320 [00:02<00:18, 14.95it/s]2026-02-23 16:50:01,190 | INFO | ✅ Downloaded monthly klines for CRVUSDT 2022-01
-2026-02-23 16:50:01,275 | INFO | ✅ Downloaded monthly klines for 1INCHUSDT 2022-01
-Downloading raw files:  12%|█▏        | 39/320 [00:02<00:19, 14.69it/s]2026-02-23 16:50:01,317 | INFO | ✅ Downloaded monthly fundingRate for SUSHIUSDT 2022-01
-2026-02-23 16:50:01,398 | INFO | ✅ Downloaded monthly klines for SUSHIUSDT 2022-01
-Downloading raw files:  13%|█▎        | 41/320 [00:02<00:18, 15.06it/s]2026-02-23 16:50:01,433 | INFO | ✅ Downloaded monthly fundingRate for 1INCHUSDT 2022-01
-2026-02-23 16:50:01,584 | INFO | ✅ Downloaded monthly fundingRate for LINKUSDT 2022-01
-Downloading raw files:  13%|█▎        | 43/320 [00:03<00:20, 13.58it/s]2026-02-23 16:50:01,681 | INFO | ✅ Downloaded monthly klines for LINKUSDT 2022-01
-2026-02-23 16:50:01,786 | INFO | ✅ Downloaded monthly fundingRate for DOTUSDT 2022-01
-Downloading raw files:  14%|█▍        | 45/320 [00:03<00:22, 12.27it/s]2026-02-23 16:50:01,813 | INFO | ✅ Downloaded monthly fundingRate for ENJUSDT 2022-01
-2026-02-23 16:50:01,835 | INFO | ✅ Downloaded monthly klines for DOTUSDT 2022-01
-2026-02-23 16:50:01,861 | INFO | ✅ Downloaded monthly klines for ENJUSDT 2022-01
-2026-02-23 16:50:01,879 | INFO | ✅ Downloaded monthly fundingRate for BATUSDT 2022-01
-2026-02-23 16:50:02,012 | INFO | ✅ Downloaded monthly fundingRate for LTCUSDT 2022-01
-Downloading raw files:  16%|█▌        | 50/320 [00:03<00:17, 15.82it/s]2026-02-23 16:50:02,094 | INFO | ✅ Downloaded monthly fundingRate for MATICUSDT 2022-01
-2026-02-23 16:50:02,108 | INFO | ✅ Downloaded monthly klines for MATICUSDT 2022-01
-2026-02-23 16:50:02,149 | INFO | ✅ Downloaded monthly klines for BATUSDT 2022-01
-Downloading raw files:  17%|█▋        | 53/320 [00:03<00:15, 17.26it/s]2026-02-23 16:50:02,279 | INFO | ✅ Downloaded monthly fundingRate for ZILUSDT 2022-01
-2026-02-23 16:50:02,289 | INFO | ✅ Downloaded monthly klines for KSMUSDT 2022-01
-Downloading raw files:  17%|█▋        | 55/320 [00:03<00:16, 16.51it/s]2026-02-23 16:50:02,305 | INFO | ✅ Downloaded monthly fundingRate for BCHUSDT 2022-01
-2026-02-23 16:50:02,336 | INFO | ✅ Downloaded monthly klines for LTCUSDT 2022-01
-2026-02-23 16:50:02,356 | INFO | ✅ Downloaded monthly klines for ZILUSDT 2022-01
-2026-02-23 16:50:02,382 | INFO | ✅ Downloaded monthly fundingRate for KSMUSDT 2022-01
-2026-02-23 16:50:02,603 | INFO | ✅ Downloaded monthly klines for BCHUSDT 2022-01
-Downloading raw files:  19%|█▉        | 60/320 [00:04<00:16, 16.24it/s]2026-02-23 16:50:02,661 | INFO | ✅ Downloaded monthly fundingRate for NEARUSDT 2022-01
-2026-02-23 16:50:02,781 | INFO | ✅ Downloaded monthly klines for GRTUSDT 2022-01
-Downloading raw files:  19%|█▉        | 62/320 [00:04<00:17, 14.86it/s]2026-02-23 16:50:02,793 | INFO | ✅ Downloaded monthly fundingRate for ETCUSDT 2022-01
-2026-02-23 16:50:02,811 | INFO | ✅ Downloaded monthly klines for ETCUSDT 2022-01
-2026-02-23 16:50:02,948 | INFO | ✅ Downloaded monthly fundingRate for UNIUSDT 2022-01
-Downloading raw files:  20%|██        | 65/320 [00:04<00:16, 15.71it/s]2026-02-23 16:50:02,966 | INFO | ✅ Downloaded monthly klines for NEARUSDT 2022-01
-2026-02-23 16:50:03,005 | INFO | ✅ Downloaded monthly fundingRate for GRTUSDT 2022-01
-2026-02-23 16:50:03,218 | INFO | ✅ Downloaded monthly fundingRate for LRCUSDT 2022-01
-Downloading raw files:  21%|██▏       | 68/320 [00:04<00:18, 13.97it/s]2026-02-23 16:50:03,302 | INFO | ✅ Downloaded monthly klines for LRCUSDT 2022-01
-2026-02-23 16:50:03,376 | INFO | ✅ Downloaded monthly klines for UNIUSDT 2022-01
-Downloading raw files:  22%|██▏       | 70/320 [00:04<00:18, 13.66it/s]2026-02-23 16:50:03,434 | INFO | ✅ Downloaded monthly fundingRate for OCEANUSDT 2022-01
-2026-02-23 16:50:03,479 | INFO | ✅ Downloaded monthly klines for OCEANUSDT 2022-01
-Downloading raw files:  22%|██▎       | 72/320 [00:04<00:16, 14.71it/s]2026-02-23 16:50:03,505 | INFO | ✅ Downloaded monthly klines for ATOMUSDT 2022-01
-2026-02-23 16:50:03,667 | INFO | ✅ Downloaded monthly fundingRate for ROSEUSDT 2022-01
-Downloading raw files:  23%|██▎       | 74/320 [00:05<00:18, 13.39it/s]2026-02-23 16:50:03,686 | INFO | ✅ Downloaded monthly fundingRate for ATOMUSDT 2022-01
-2026-02-23 16:50:03,940 | INFO | ✅ Downloaded monthly klines for ROSEUSDT 2022-01
-Downloading raw files:  24%|██▍       | 76/320 [00:05<00:22, 10.96it/s]2026-02-23 16:50:04,146 | INFO | ✅ Downloaded monthly fundingRate for OMGUSDT 2022-01
-2026-02-23 16:50:04,231 | INFO | ✅ Downloaded monthly klines for OMGUSDT 2022-01
-Downloading raw files:  24%|██▍       | 78/320 [00:05<00:25,  9.40it/s]2026-02-23 16:50:04,359 | INFO | ✅ Downloaded monthly fundingRate for WAVESUSDT 2022-01
-2026-02-23 16:50:04,370 | INFO | ✅ Downloaded monthly klines for WAVESUSDT 2022-01
-Downloading raw files:  25%|██▌       | 80/320 [00:05<00:23, 10.43it/s]2026-02-23 16:50:04,501 | INFO | ✅ Downloaded monthly fundingRate for FILUSDT 2022-01
-2026-02-23 16:50:04,572 | INFO | ✅ Downloaded monthly fundingRate for ICXUSDT 2022-01
-Downloading raw files:  26%|██▌       | 82/320 [00:06<00:23, 10.28it/s]2026-02-23 16:50:04,602 | INFO | ✅ Downloaded monthly klines for FILUSDT 2022-01
-2026-02-23 16:50:04,610 | INFO | ✅ Downloaded monthly klines for ICXUSDT 2022-01
-2026-02-23 16:50:04,822 | INFO | ✅ Downloaded monthly fundingRate for ONTUSDT 2022-01
-Downloading raw files:  27%|██▋       | 85/320 [00:06<00:21, 10.87it/s]2026-02-23 16:50:04,892 | INFO | ✅ Downloaded monthly klines for ONTUSDT 2022-01
-2026-02-23 16:50:05,129 | INFO | ✅ Downloaded monthly fundingRate for ZRXUSDT 2022-01
-Downloading raw files:  27%|██▋       | 87/320 [00:06<00:25,  9.22it/s]2026-02-23 16:50:05,146 | INFO | ✅ Downloaded monthly klines for ZRXUSDT 2022-01
-2026-02-23 16:50:05,298 | INFO | ✅ Downloaded monthly fundingRate for DYDXUSDT 2022-01
-Downloading raw files:  28%|██▊       | 89/320 [00:06<00:23,  9.82it/s]2026-02-23 16:50:05,400 | INFO | ✅ Downloaded monthly fundingRate for KNCUSDT 2022-01
-2026-02-23 16:50:05,402 | INFO | ✅ Downloaded monthly klines for KNCUSDT 2022-01
-Downloading raw files:  28%|██▊       | 91/320 [00:06<00:20, 11.41it/s]2026-02-23 16:50:05,411 | INFO | ✅ Downloaded monthly klines for DYDXUSDT 2022-01
-2026-02-23 16:50:05,600 | INFO | ✅ Downloaded monthly fundingRate for BAKEUSDT 2022-01
-Downloading raw files:  29%|██▉       | 93/320 [00:07<00:20, 10.99it/s]2026-02-23 16:50:05,668 | INFO | ✅ Downloaded monthly klines for BAKEUSDT 2022-01
-2026-02-23 16:50:05,800 | INFO | ✅ Downloaded monthly fundingRate for GALAUSDT 2022-01
-Downloading raw files:  30%|██▉       | 95/320 [00:07<00:21, 10.67it/s]2026-02-23 16:50:05,814 | INFO | ✅ Downloaded monthly fundingRate for CELRUSDT 2022-01
-2026-02-23 16:50:05,866 | INFO | ✅ Downloaded monthly klines for COTIUSDT 2022-01
-2026-02-23 16:50:05,874 | INFO | ✅ Downloaded monthly fundingRate for COTIUSDT 2022-01
-2026-02-23 16:50:05,890 | INFO | ✅ Downloaded monthly klines for GALAUSDT 2022-01
-2026-02-23 16:50:05,922 | INFO | ✅ Downloaded monthly klines for CELRUSDT 2022-01
-Downloading raw files:  31%|███▏      | 100/320 [00:07<00:12, 17.14it/s]2026-02-23 16:50:06,019 | INFO | ✅ Downloaded monthly fundingRate for FTMUSDT 2022-01
-2026-02-23 16:50:06,266 | INFO | ✅ Downloaded monthly fundingRate for RENUSDT 2022-01
-2026-02-23 16:50:06,323 | INFO | ✅ Downloaded monthly klines for FTMUSDT 2022-01
-Downloading raw files:  32%|███▏      | 103/320 [00:07<00:17, 12.32it/s]2026-02-23 16:50:06,331 | INFO | ✅ Downloaded monthly klines for RENUSDT 2022-01
-2026-02-23 16:50:06,362 | INFO | ✅ Downloaded monthly fundingRate for RUNEUSDT 2022-01
-2026-02-23 16:50:06,387 | INFO | ✅ Downloaded monthly fundingRate for SKLUSDT 2022-01
-2026-02-23 16:50:06,402 | INFO | ✅ Downloaded monthly klines for RUNEUSDT 2022-01
-2026-02-23 16:50:06,455 | INFO | ✅ Downloaded monthly klines for SKLUSDT 2022-01
-Downloading raw files:  34%|███▍      | 108/320 [00:07<00:12, 17.18it/s]2026-02-23 16:50:06,573 | INFO | ✅ Downloaded monthly fundingRate for SXPUSDT 2022-01
-2026-02-23 16:50:06,587 | INFO | ✅ Downloaded monthly fundingRate for EGLDUSDT 2022-01
-2026-02-23 16:50:06,640 | INFO | ✅ Downloaded monthly fundingRate for AAVEUSDT 2022-01
-Downloading raw files:  35%|███▍      | 111/320 [00:08<00:12, 16.93it/s]2026-02-23 16:50:06,650 | INFO | ✅ Downloaded monthly klines for RLCUSDT 2022-01
-2026-02-23 16:50:06,784 | INFO | ✅ Downloaded monthly fundingRate for RLCUSDT 2022-01
-2026-02-23 16:50:06,827 | INFO | ✅ Downloaded monthly klines for SXPUSDT 2022-01
-2026-02-23 16:50:06,828 | INFO | ✅ Downloaded monthly klines for EGLDUSDT 2022-01
-Downloading raw files:  36%|███▌      | 114/320 [00:08<00:12, 16.65it/s]2026-02-23 16:50:06,932 | INFO | ✅ Downloaded monthly klines for AAVEUSDT 2022-01
-Downloading raw files:  36%|███▋      | 116/320 [00:08<00:11, 17.13it/s]2026-02-23 16:50:07,031 | INFO | ✅ Downloaded monthly klines for SANDUSDT 2022-01
-2026-02-23 16:50:07,192 | INFO | ✅ Downloaded monthly fundingRate for SANDUSDT 2022-01
-Downloading raw files:  37%|███▋      | 118/320 [00:08<00:15, 13.38it/s]2026-02-23 16:50:07,209 | INFO | ✅ Downloaded monthly fundingRate for STMXUSDT 2022-01
-2026-02-23 16:50:07,321 | INFO | ✅ Downloaded monthly klines for STMXUSDT 2022-01
-Downloading raw files:  38%|███▊      | 120/320 [00:08<00:14, 13.85it/s]2026-02-23 16:50:07,361 | INFO | ✅ Downloaded monthly fundingRate for MANAUSDT 2022-01
-2026-02-23 16:50:07,371 | INFO | ✅ Downloaded monthly fundingRate for DUSKUSDT 2022-01
-2026-02-23 16:50:07,379 | INFO | ✅ Downloaded monthly klines for MANAUSDT 2022-01
-2026-02-23 16:50:07,452 | INFO | ✅ Downloaded monthly klines for DUSKUSDT 2022-01
-Downloading raw files:  39%|███▉      | 124/320 [00:08<00:10, 17.88it/s]2026-02-23 16:50:07,482 | INFO | ✅ Downloaded monthly klines for ANKRUSDT 2022-01
-2026-02-23 16:50:07,618 | INFO | ✅ Downloaded monthly fundingRate for AXSUSDT 2022-01
-2026-02-23 16:50:07,706 | INFO | ✅ Downloaded monthly klines for CHZUSDT 2022-01
-Downloading raw files:  40%|███▉      | 127/320 [00:09<00:12, 15.44it/s]2026-02-23 16:50:07,738 | INFO | ✅ Downloaded monthly klines for CTKUSDT 2022-01
-2026-02-23 16:50:07,753 | INFO | ✅ Downloaded monthly klines for AXSUSDT 2022-01
-2026-02-23 16:50:07,763 | INFO | ✅ Downloaded monthly fundingRate for ANKRUSDT 2022-01
-2026-02-23 16:50:07,897 | INFO | ✅ Downloaded monthly fundingRate for CTKUSDT 2022-01
-Downloading raw files:  41%|████      | 131/320 [00:09<00:11, 17.11it/s]2026-02-23 16:50:07,911 | INFO | ✅ Downloaded monthly fundingRate for CHZUSDT 2022-01
-2026-02-23 16:50:07,934 | INFO | ✅ Downloaded monthly fundingRate for KAVAUSDT 2022-01
-2026-02-23 16:50:08,125 | INFO | ✅ Downloaded monthly klines for ZECUSDT 2022-01
-Downloading raw files:  42%|████▏     | 134/320 [00:09<00:11, 15.76it/s]2026-02-23 16:50:08,165 | INFO | ✅ Downloaded monthly fundingRate for MASKUSDT 2022-01
-2026-02-23 16:50:08,304 | INFO | ✅ Downloaded monthly klines for KAVAUSDT 2022-01
-Downloading raw files:  42%|████▎     | 136/320 [00:09<00:12, 14.49it/s]2026-02-23 16:50:08,337 | INFO | ✅ Downloaded monthly klines for MASKUSDT 2022-01
-2026-02-23 16:50:08,445 | INFO | ✅ Downloaded monthly klines for ARPAUSDT 2022-01
-Downloading raw files:  43%|████▎     | 138/320 [00:09<00:12, 14.42it/s]Downloading raw files:  43%|████▎     | 138/320 [00:19<00:12, 14.42it/s]Downloading raw files:  43%|████▎     | 139/320 [00:27<07:47,  2.58s/it]Downloading raw files:  44%|████▍     | 140/320 [00:27<06:30,  2.17s/it]Downloading raw files:  44%|████▍     | 142/320 [00:27<04:27,  1.50s/it]Downloading raw files:  45%|████▌     | 144/320 [00:28<03:04,  1.05s/it]Downloading raw files:  46%|████▋     | 148/320 [00:28<01:37,  1.77it/s]Downloading raw files:  48%|████▊     | 153/320 [00:28<00:53,  3.13it/s]Downloading raw files:  49%|████▉     | 156/320 [00:28<00:41,  3.96it/s]Downloading raw files:  50%|████▉     | 159/320 [00:28<00:31,  5.04it/s]Downloading raw files:  50%|█████     | 161/320 [00:29<00:29,  5.45it/s]Downloading raw files:  51%|█████     | 163/320 [00:29<00:26,  5.86it/s]Downloading raw files:  52%|█████▏    | 165/320 [00:29<00:22,  6.97it/s]Downloading raw files:  52%|█████▏    | 167/320 [00:29<00:22,  6.75it/s]Downloading raw files:  53%|█████▎    | 170/320 [00:30<00:17,  8.34it/s]Downloading raw files:  54%|█████▍    | 172/320 [00:30<00:17,  8.45it/s]Downloading raw files:  54%|█████▍    | 174/320 [00:30<00:17,  8.48it/s]Downloading raw files:  55%|█████▌    | 176/320 [00:30<00:21,  6.76it/s]Downloading raw files:  56%|█████▌    | 178/320 [00:31<00:22,  6.26it/s]Downloading raw files:  56%|█████▋    | 180/320 [00:31<00:23,  5.92it/s]Downloading raw files:  57%|█████▋    | 182/320 [00:32<00:24,  5.74it/s]Downloading raw files:  57%|█████▊    | 184/320 [00:32<00:20,  6.52it/s]Downloading raw files:  58%|█████▊    | 185/320 [00:32<00:22,  5.90it/s]Downloading raw files:  58%|█████▊    | 186/320 [00:32<00:21,  6.10it/s]Downloading raw files:  58%|█████▊    | 187/320 [00:32<00:24,  5.52it/s]Downloading raw files:  59%|█████▉    | 188/320 [00:33<00:22,  5.83it/s]Downloading raw files:  59%|█████▉    | 189/320 [00:33<00:21,  6.08it/s]Downloading raw files:  59%|█████▉    | 190/320 [00:33<00:19,  6.75it/s]Downloading raw files:  60%|█████▉    | 191/320 [00:33<00:23,  5.41it/s]Downloading raw files:  60%|██████    | 192/320 [00:33<00:20,  6.18it/s]Downloading raw files:  60%|██████    | 193/320 [00:33<00:24,  5.15it/s]Downloading raw files:  61%|██████    | 194/320 [00:34<00:21,  5.80it/s]Downloading raw files:  61%|██████    | 195/320 [00:34<00:24,  5.03it/s]Downloading raw files:  61%|██████▏   | 196/320 [00:34<00:21,  5.80it/s]Downloading raw files:  62%|██████▏   | 198/320 [00:34<00:22,  5.53it/s]Downloading raw files:  62%|██████▎   | 200/320 [00:35<00:21,  5.46it/s]Downloading raw files:  63%|██████▎   | 201/320 [00:35<00:20,  5.73it/s]Downloading raw files:  63%|██████▎   | 202/320 [00:35<00:26,  4.49it/s]Downloading raw files:  63%|██████▎   | 203/320 [00:35<00:25,  4.59it/s]Downloading raw files:  64%|██████▍   | 204/320 [00:36<00:30,  3.83it/s]Downloading raw files:  64%|██████▍   | 205/320 [00:36<00:33,  3.39it/s]Downloading raw files:  64%|██████▍   | 206/320 [00:37<00:37,  3.07it/s]Downloading raw files:  65%|██████▍   | 207/320 [00:37<00:39,  2.89it/s]Downloading raw files:  65%|██████▌   | 208/320 [00:37<00:39,  2.82it/s]Downloading raw files:  65%|██████▌   | 209/320 [00:38<00:40,  2.75it/s]Downloading raw files:  66%|██████▌   | 210/320 [00:38<00:40,  2.69it/s]Downloading raw files:  66%|██████▌   | 211/320 [00:38<00:33,  3.29it/s]Downloading raw files:  66%|██████▋   | 212/320 [00:39<00:35,  3.07it/s]Downloading raw files:  67%|██████▋   | 213/320 [00:39<00:37,  2.88it/s]Downloading raw files:  67%|██████▋   | 214/320 [00:39<00:37,  2.81it/s]Downloading raw files:  67%|██████▋   | 215/320 [00:40<00:37,  2.77it/s]Downloading raw files:  68%|██████▊   | 216/320 [00:40<00:33,  3.14it/s]Downloading raw files:  68%|██████▊   | 218/320 [00:40<00:20,  4.89it/s]Downloading raw files:  69%|██████▉   | 220/320 [00:40<00:16,  6.20it/s]Downloading raw files:  69%|██████▉   | 222/320 [00:41<00:14,  6.58it/s]Downloading raw files:  70%|██████▉   | 223/320 [00:41<00:13,  6.93it/s]Downloading raw files:  70%|███████   | 225/320 [00:41<00:13,  7.13it/s]Downloading raw files:  71%|███████   | 227/320 [00:41<00:12,  7.74it/s]Downloading raw files:  71%|███████▏  | 228/320 [00:41<00:12,  7.34it/s]Downloading raw files:  72%|███████▏  | 230/320 [00:42<00:13,  6.43it/s]Downloading raw files:  72%|███████▎  | 232/320 [00:42<00:10,  8.18it/s]Downloading raw files:  73%|███████▎  | 234/320 [00:42<00:11,  7.25it/s]Downloading raw files:  74%|███████▍  | 236/320 [00:43<00:11,  7.04it/s]Downloading raw files:  74%|███████▍  | 238/320 [00:43<00:09,  8.51it/s]Downloading raw files:  75%|███████▌  | 240/320 [00:43<00:10,  7.57it/s]Downloading raw files:  76%|███████▌  | 242/320 [00:43<00:10,  7.32it/s]Downloading raw files:  77%|███████▋  | 245/320 [00:43<00:07, 10.10it/s]Downloading raw files:  77%|███████▋  | 247/320 [00:44<00:06, 11.56it/s]Downloading raw files:  78%|███████▊  | 249/320 [00:44<00:06, 11.21it/s]Downloading raw files:  78%|███████▊  | 251/320 [00:44<00:06, 11.04it/s]Downloading raw files:  79%|███████▉  | 253/320 [00:44<00:06, 10.69it/s]Downloading raw files:  80%|███████▉  | 255/320 [00:44<00:05, 10.95it/s]Downloading raw files:  80%|████████  | 257/320 [00:44<00:05, 10.89it/s]Downloading raw files:  81%|████████▏ | 260/320 [00:45<00:04, 14.14it/s]Downloading raw files:  82%|████████▏ | 262/320 [00:45<00:04, 14.11it/s]Downloading raw files:  82%|████████▎ | 264/320 [00:45<00:03, 14.62it/s]Downloading raw files:  84%|████████▍ | 268/320 [00:45<00:02, 18.51it/s]Downloading raw files:  84%|████████▍ | 270/320 [00:45<00:02, 17.22it/s]Downloading raw files:  85%|████████▌ | 272/320 [00:45<00:02, 17.26it/s]Downloading raw files:  86%|████████▋ | 276/320 [00:45<00:01, 22.14it/s]Downloading raw files:  87%|████████▋ | 279/320 [00:46<00:01, 21.21it/s]Downloading raw files:  88%|████████▊ | 282/320 [00:46<00:01, 21.66it/s]Downloading raw files:  89%|████████▉ | 285/320 [00:46<00:01, 20.67it/s]Downloading raw files:  90%|█████████ | 288/320 [00:46<00:01, 19.35it/s]Downloading raw files:  91%|█████████▏| 292/320 [00:46<00:01, 20.06it/s]Downloading raw files:  92%|█████████▎| 296/320 [00:46<00:01, 21.00it/s]Downloading raw files:  94%|█████████▍| 301/320 [00:47<00:00, 21.79it/s]Downloading raw files:  96%|█████████▌| 307/320 [00:47<00:00, 26.38it/s]Downloading raw files:  98%|█████████▊| 313/320 [00:47<00:00, 26.41it/s]Downloading raw files:  99%|█████████▉| 317/320 [00:47<00:00, 24.62it/s]Downloading raw files: 100%|██████████| 320/320 [00:56<00:00,  1.42it/s]Downloading raw files: 100%|██████████| 320/320 [00:56<00:00,  5.61it/s]
-2026-02-23 16:50:55,537 | INFO | ✅ Downloads complete. Building panel...
-Processing symbols:   0%|          | 0/80 [00:00<?, ?it/s]2026-02-23 16:50:55,559 | INFO | Loaded cache for BTCUSDT
-2026-02-23 16:50:55,562 | INFO | Loaded cache for ETHUSDT
-2026-02-23 16:50:55,580 | INFO | Cached BNBUSDT
-2026-02-23 16:50:55,591 | INFO | Cached SOLUSDT
-2026-02-23 16:50:55,602 | INFO | Cached XRPUSDT
-2026-02-23 16:50:55,613 | INFO | Cached DOGEUSDT
-2026-02-23 16:50:55,623 | INFO | Cached ADAUSDT
-2026-02-23 16:50:55,634 | INFO | Cached TRXUSDT
-2026-02-23 16:50:55,644 | INFO | Cached AVAXUSDT
-Processing symbols:  11%|█▏        | 9/80 [00:00<00:00, 88.27it/s]2026-02-23 16:50:55,646 | WARNING | No klines found for SHIBUSDT, skipping...
-2026-02-23 16:50:55,655 | INFO | Cached LINKUSDT
-2026-02-23 16:50:55,664 | INFO | Cached DOTUSDT
-2026-02-23 16:50:55,674 | INFO | Cached MATICUSDT
-2026-02-23 16:50:55,684 | INFO | Cached LTCUSDT
-2026-02-23 16:50:55,694 | INFO | Cached BCHUSDT
-2026-02-23 16:50:55,704 | INFO | Cached ETCUSDT
-2026-02-23 16:50:55,714 | INFO | Cached NEARUSDT
-2026-02-23 16:50:55,724 | INFO | Cached UNIUSDT
-2026-02-23 16:50:55,725 | WARNING | No klines found for APTUSDT, skipping...
-2026-02-23 16:50:55,734 | INFO | Cached ATOMUSDT
-2026-02-23 16:50:55,735 | WARNING | No klines found for LDOUSDT, skipping...
-2026-02-23 16:50:55,736 | WARNING | No klines found for OPUSDT, skipping...
-2026-02-23 16:50:55,737 | WARNING | No klines found for ARBUSDT, skipping...
-2026-02-23 16:50:55,745 | INFO | Cached FILUSDT
-Processing symbols:  30%|███       | 24/80 [00:00<00:00, 123.25it/s]2026-02-23 16:50:55,747 | WARNING | No klines found for INJUSDT, skipping...
-2026-02-23 16:50:55,748 | WARNING | No klines found for SUIUSDT, skipping...
-2026-02-23 16:50:55,748 | WARNING | No klines found for TONUSDT, skipping...
-2026-02-23 16:50:55,757 | INFO | Cached DYDXUSDT
-2026-02-23 16:50:55,768 | INFO | Cached GALAUSDT
-2026-02-23 16:50:55,770 | WARNING | No klines found for APEUSDT, skipping...
-2026-02-23 16:50:55,779 | INFO | Cached FTMUSDT
-2026-02-23 16:50:55,789 | INFO | Cached RUNEUSDT
-2026-02-23 16:50:55,798 | INFO | Cached EGLDUSDT
-2026-02-23 16:50:55,808 | INFO | Cached AAVEUSDT
-2026-02-23 16:50:55,817 | INFO | Cached SANDUSDT
-2026-02-23 16:50:55,827 | INFO | Cached MANAUSDT
-2026-02-23 16:50:55,837 | INFO | Cached AXSUSDT
-2026-02-23 16:50:55,848 | INFO | Cached CHZUSDT
-Processing symbols:  48%|████▊     | 38/80 [00:00<00:00, 129.56it/s]2026-02-23 16:50:55,858 | INFO | Cached KAVAUSDT
-2026-02-23 16:50:55,868 | INFO | Cached ZECUSDT
-2026-02-23 16:50:55,878 | INFO | Cached XMRUSDT
-2026-02-23 16:50:55,887 | INFO | Cached EOSUSDT
-2026-02-23 16:50:55,896 | INFO | Cached THETAUSDT
-2026-02-23 16:50:55,906 | INFO | Cached IOTAUSDT
-2026-02-23 16:50:55,916 | INFO | Cached MKRUSDT
-2026-02-23 16:50:55,925 | INFO | Cached SNXUSDT
-2026-02-23 16:50:55,934 | INFO | Cached COMPUSDT
-2026-02-23 16:50:55,944 | INFO | Cached CRVUSDT
-2026-02-23 16:50:55,954 | INFO | Cached SUSHIUSDT
-2026-02-23 16:50:55,965 | INFO | Cached 1INCHUSDT
-2026-02-23 16:50:55,975 | INFO | Cached ENJUSDT
-Processing symbols:  64%|██████▍   | 51/80 [00:00<00:00, 117.23it/s]2026-02-23 16:50:55,985 | INFO | Cached BATUSDT
-2026-02-23 16:50:55,994 | INFO | Cached ZILUSDT
-2026-02-23 16:50:56,003 | INFO | Cached KSMUSDT
-2026-02-23 16:50:56,005 | WARNING | No klines found for FLOWUSDT, skipping...
-2026-02-23 16:50:56,014 | INFO | Cached GRTUSDT
-2026-02-23 16:50:56,024 | INFO | Cached LRCUSDT
-2026-02-23 16:50:56,033 | INFO | Cached OCEANUSDT
-2026-02-23 16:50:56,035 | WARNING | No klines found for QNTUSDT, skipping...
-2026-02-23 16:50:56,044 | INFO | Cached ROSEUSDT
-2026-02-23 16:50:56,054 | INFO | Cached OMGUSDT
-2026-02-23 16:50:56,063 | INFO | Cached WAVESUSDT
-2026-02-23 16:50:56,074 | INFO | Cached ICXUSDT
-2026-02-23 16:50:56,084 | INFO | Cached ONTUSDT
-Processing symbols:  80%|████████  | 64/80 [00:00<00:00, 117.98it/s]2026-02-23 16:50:56,094 | INFO | Cached ZRXUSDT
-2026-02-23 16:50:56,105 | INFO | Cached KNCUSDT
-2026-02-23 16:50:56,115 | INFO | Cached BAKEUSDT
-2026-02-23 16:50:56,126 | INFO | Cached CELRUSDT
-2026-02-23 16:50:56,136 | INFO | Cached COTIUSDT
-2026-02-23 16:50:56,146 | INFO | Cached RENUSDT
-2026-02-23 16:50:56,157 | INFO | Cached SKLUSDT
-2026-02-23 16:50:56,167 | INFO | Cached SXPUSDT
-2026-02-23 16:50:56,177 | INFO | Cached RLCUSDT
-2026-02-23 16:50:56,187 | INFO | Cached STMXUSDT
-2026-02-23 16:50:56,198 | INFO | Cached DUSKUSDT
-2026-02-23 16:50:56,208 | INFO | Cached ANKRUSDT
-Processing symbols:  95%|█████████▌| 76/80 [00:00<00:00, 110.28it/s]2026-02-23 16:50:56,218 | INFO | Cached CTKUSDT
-2026-02-23 16:50:56,228 | INFO | Cached MASKUSDT
-2026-02-23 16:50:56,237 | INFO | Cached ARPAUSDT
-2026-02-23 16:50:56,248 | INFO | Cached BELUSDT
-Processing symbols: 100%|██████████| 80/80 [00:00<00:00, 113.36it/s]
-/app/binance-perps-pro/process_data.py:461: DeprecationWarning: datetime.datetime.utcnow() is deprecated and scheduled for removal in a future version. Use timezone-aware objects to represent datetimes in UTC: datetime.datetime.now(datetime.UTC).
-  "generated": datetime.utcnow().isoformat(),
-2026-02-23 16:50:56,276 | INFO | ✅ SUCCESS! Parquet: data/binance_perps_panel_2022_2026.parquet (0.3 MB)
