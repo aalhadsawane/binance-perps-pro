@@ -54,7 +54,7 @@ OUTPUT_METADATA_PARQUET = Path(f"data/symbol_information.parquet")
 START_DATE = date(2022, 1, 1)
 
 # Version string to invalidate cache if logic changes
-CODE_VERSION = "1.9"
+CODE_VERSION = "1.10"
 
 # Robust symbols.txt path
 SYMBOLS_FILE = Path(__file__).parent / "symbols.txt"
@@ -530,11 +530,13 @@ async def build_panel(end_date: date | None = None, max_symbols: int = 80):
                 pl.when(pl.col("volume").is_not_null() & (pl.col("volume") > 0))
                   .then(pl.col("timestamp"))
                   .otherwise(None)
+                  .drop_nulls()
                   .first()
                   .alias("_first"),
                 pl.when(pl.col("volume").is_not_null() & (pl.col("volume") > 0))
                   .then(pl.col("timestamp"))
                   .otherwise(None)
+                  .drop_nulls()
                   .last()
                   .alias("_last"),
             ])
