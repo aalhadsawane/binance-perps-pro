@@ -1,9 +1,0 @@
-2026-02-24 12:18:10,138 | INFO | Building panel with 1 symbols (max=1)
-Downloading raw files:   0%|          | 0/4 [00:00<?, ?it/s]2026-02-24 12:18:10,164 | INFO | ✅ Downloaded monthly fundingRate for BTCUSDT 2022-01
-2026-02-24 12:18:10,164 | INFO | ✅ Downloaded monthly klines for BTCUSDT 2022-01
-2026-02-24 12:18:10,164 | INFO | ✅ Downloaded monthly markPrice for BTCUSDT 2022-01
-Downloading raw files: 100%|██████████| 4/4 [00:00<00:00, 2973.63it/s]
-2026-02-24 12:18:10,165 | INFO | ✅ Downloads complete. Building panel...
-Processing symbols:   0%|          | 0/1 [00:00<?, ?it/s]2026-02-24 12:18:10,231 | INFO | Loaded cache for BTCUSDT
-Processing symbols: 100%|██████████| 1/1 [00:00<00:00, 32.84it/s]
-2026-02-24 12:18:10,255 | INFO | ✅ SUCCESS! Parquet: data/binance_perps_panel_2022_2026.parquet (0.0 MB)
