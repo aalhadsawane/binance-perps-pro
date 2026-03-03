@@ -117,6 +117,19 @@ df = load_panel(start_date="2023-01-01", end_date="2023-06-01", symbols=["BTCUSD
 print(df)
 ```
 
+### Exporting to CSV
+If you prefer to work with traditional CSV files rather than Parquet, you can easily export the generated data using `pandas`:
+
+```python
+import pandas as pd
+
+# Export the main panel to CSV
+pd.read_parquet("data/binance_perps_panel_2022_2024_YYYYMMDD.parquet").to_csv("data/panel_output.csv", index=False)
+
+# Export symbol metadata to CSV
+pd.read_parquet("data/symbol_information.parquet").to_csv("data/symbol_information.csv", index=False)
+```
+
 ## Data Handling & Methodology
 
 ### 1. Missing Data & Gaps
