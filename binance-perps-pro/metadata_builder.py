@@ -162,7 +162,7 @@ def build_symbol_metadata(panel_df: pl.DataFrame, exchange_info: dict | None) ->
     if not rows:
         return pl.DataFrame(schema=schema)
 
-    return pl.DataFrame(rows).with_columns([
+    return pl.DataFrame(rows, schema=schema).with_columns([
         pl.col("symbol").cast(pl.Utf8),
         pl.col("base_asset").cast(pl.Utf8),
         pl.col("quote_asset").cast(pl.Utf8),
