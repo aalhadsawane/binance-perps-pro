@@ -58,9 +58,9 @@ A separate file `data/symbol_information.parquet` contains static and statistica
 | `tick_size` | Min Price Increment | Binance API |
 | `min_qty` | Min Quantity | Binance API |
 | `min_notional` | Min Trade Value | Binance API |
-| `first_trade_time` | First candle timestamp | Derived from Data |
+| `first_trade_time` | First candle timestamp (Note: max(2022-01-01, actual_first_event) since data collection starts at 2022-01-01) | Derived from Data |
 | `last_trade_time` | Last candle timestamp | Derived from Data |
-| `first_funding_time`| First funding timestamp| Derived from Data |
+| `first_funding_time`| First funding timestamp (Note: max(2022-01-01, actual_first_event) since data collection starts at 2022-01-01) | Derived from Data |
 
 Use `loader.load_metadata()` to access this file.
 

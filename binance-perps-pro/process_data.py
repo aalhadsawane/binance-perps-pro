@@ -598,7 +598,7 @@ async def build_panel(end_date: date | None = None, max_symbols: int = 80):
 
     # === BUILD & SAVE SYMBOL INFORMATION ===
     try:
-        final_metadata = build_symbol_metadata(panel, exchange_info)
+        final_metadata = build_symbol_metadata(panel, exchange_info, active_symbols)
         final_metadata.write_parquet(OUTPUT_METADATA_PARQUET)
         logger.info(f"✅ Symbol Information saved: {OUTPUT_METADATA_PARQUET}")
     except Exception as e:
