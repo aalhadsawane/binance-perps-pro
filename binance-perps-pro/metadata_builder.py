@@ -7,7 +7,7 @@ from pathlib import Path
 
 logger = logging.getLogger(__name__)
 
-def build_symbol_metadata(panel_df: pl.DataFrame, exchange_info: dict | None) -> pl.DataFrame:
+def build_symbol_metadata(panel_df: pl.DataFrame, exchange_info: dict | None, universe_symbols: list[str] | None = None) -> pl.DataFrame:
     """
     Constructs the symbol metadata DataFrame by combining:
     1. Empirical stats from the Panel (first/last trade times).
@@ -86,21 +86,28 @@ def build_symbol_metadata(panel_df: pl.DataFrame, exchange_info: dict | None) ->
                 "lot_size": lot_size,
                 "min_qty": min_qty,
                 "min_notional": min_notional,
-                "max_leverage": None # Not available
             }
 
     # 3. Merge Logic
     rows = []
 
-    # Iterate through all symbols found in the PANEL (our universe)
-    # This ensures we cover delisted coins that are in our data but not in API.
-    if "symbol" in stats.columns:
+    if universe_symbols is not None:
+        unique_symbols = universe_symbols
+    elif "symbol" in stats.columns:
         unique_symbols = stats["symbol"].drop_nulls().to_list()
     else:
         unique_symbols = []
 
     for sym in unique_symbols:
-        emp_data = stats.filter(pl.col("symbol") == sym).to_dicts()[0]
+        emp_data = stats.filter(pl.col("symbol") == sym).to_dicts()
+        if emp_data:
+            emp_data = emp_data[0]
+        else:
+            emp_data = {
+                "first_trade_time": None,
+                "last_trade_time": None,
+                "first_funding_time": None
+            }
 
         row = {
             "symbol": sym,
@@ -129,7 +136,6 @@ def build_symbol_metadata(panel_df: pl.DataFrame, exchange_info: dict | None) ->
                 "lot_size": None,
                 "min_qty": None,
                 "min_notional": None,
-                "max_leverage": None
             })
 
         rows.append(row)
@@ -153,7 +159,6 @@ def build_symbol_metadata(panel_df: pl.DataFrame, exchange_info: dict | None) ->
         "lot_size": pl.Float64,
         "min_qty": pl.Float64,
         "min_notional": pl.Float64,
-        "max_leverage": pl.Float64,
         "first_trade_time": pl.Datetime("ms"),
         "last_trade_time": pl.Datetime("ms"),
         "first_funding_time": pl.Datetime("ms")
@@ -175,7 +180,6 @@ def build_symbol_metadata(panel_df: pl.DataFrame, exchange_info: dict | None) ->
         pl.col("lot_size").cast(pl.Float64),
         pl.col("min_qty").cast(pl.Float64),
         pl.col("min_notional").cast(pl.Float64),
-        pl.col("max_leverage").cast(pl.Float64),
         pl.col("first_trade_time").cast(pl.Datetime("ms")),
         pl.col("last_trade_time").cast(pl.Datetime("ms")),
         pl.col("first_funding_time").cast(pl.Datetime("ms"))
