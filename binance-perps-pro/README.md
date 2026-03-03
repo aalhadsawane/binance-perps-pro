@@ -1,11 +1,11 @@
 # Binance USDT-M Perpetual Clean Panel (Pro Edition)
 
-A production-grade, backtest-ready hourly dataset for the top 80 liquid USDT-M perpetual futures on Binance.
+A production-grade, backtest-ready hourly dataset for the top 100 liquid USDT-M perpetual futures on Binance.
 
 ## Features
 
 - **Period:** 2022-01-01 to Present (4+ years)
-- **Universe:** Top 80 liquid symbols (BTC, ETH, SOL, etc.)
+- **Universe:** Top 100 liquid symbols (BTC, ETH, SOL, etc.)
 - **Resolution:** Hourly (1h)
 - **Format:** Parquet (ZSTD compressed, optimized schema)
 - **Precision:** Float64 for all financial columns, correct timestamps (UTC ms)
@@ -124,7 +124,7 @@ print(df)
 - **Start Date:** Data starts from **2022-01-01**. If a symbol was listed after this date, its rows will be `null` and `is_active` will be `False` until the first valid trade volume appears.
 
 ### 2. Universe Selection & Dead Coins
-- **Universe:** The dataset tracks a fixed list of ~80 top liquid symbols (found in `symbols.txt`).
+- **Universe:** The dataset tracks a fixed list of ~100 top liquid symbols (found in `symbols.txt`).
 - **Dead/Delisted Coins:** If a coin in the universe was delisted, its data remains available up to the delisting point.
 - **Survivorship Bias:** The `is_active` boolean flag allows you to filter for currently trading assets.
   - `is_active = True`: The symbol had valid trading volume > 0 within the known history window (from first trade to last trade).

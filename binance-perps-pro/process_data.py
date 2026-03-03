@@ -431,7 +431,7 @@ async def fetch_exchange_info():
 # Metadata extraction logic moved to metadata_builder.py
 
 # ==================== MAIN PIPELINE ====================
-async def build_panel(end_date: date | None = None, max_symbols: int = 80):
+async def build_panel(end_date: date | None = None, max_symbols: int = 100):
     END_DATE = end_date or (date.today() - timedelta(days=1))
     CACHE_DIR.mkdir(parents=True, exist_ok=True)
     DATA_DIR.mkdir(parents=True, exist_ok=True)
@@ -629,7 +629,7 @@ async def build_panel(end_date: date | None = None, max_symbols: int = 80):
 
 if __name__ == "__main__":
     parser = argparse.ArgumentParser(description="Build Binance Perps Clean Panel v1.8")
-    parser.add_argument("--max-symbols", type=int, default=80, help="Fast test mode")
+    parser.add_argument("--max-symbols", type=int, default=100, help="Fast test mode")
     parser.add_argument("--end-date", type=str, help="YYYY-MM-DD")
     args = parser.parse_args()
 
